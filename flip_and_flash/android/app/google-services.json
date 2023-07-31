@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "988811633989",
+    "project_id": "flip-and-flash",
+    "storage_bucket": "flip-and-flash.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:988811633989:android:de5c551cb764bec2ef4a2c",
+        "android_client_info": {
+          "package_name": "com.example.flip_and_flash"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "988811633989-dmpk4tt8bvija1s7peh79mrnqamfh0a3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3P9ldE1vvRQdUFK7DWLK_Di3bonyV1IA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "988811633989-dmpk4tt8bvija1s7peh79mrnqamfh0a3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "988811633989-4e2j4hel1prkl63naa71g33e7e0cgv05.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flipAndFlash"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
