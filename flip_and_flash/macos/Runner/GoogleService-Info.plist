@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>988811633989-4e2j4hel1prkl63naa71g33e7e0cgv05.apps.googleusercontent.com</string>
+	<string>988811633989-l6e2igo3vfbltrg4rf0a6gnvk4ijn4to.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.988811633989-4e2j4hel1prkl63naa71g33e7e0cgv05</string>
+	<string>com.googleusercontent.apps.988811633989-l6e2igo3vfbltrg4rf0a6gnvk4ijn4to</string>
 	<key>API_KEY</key>
 	<string>AIzaSyA_euMfE96lHXUe-9ARRA_L4hsFcQSIi6g</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.flipAndFlash</string>
+	<string>com.example.flipAndFlash.RunnerTests</string>
 	<key>PROJECT_ID</key>
 	<string>flip-and-flash</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:988811633989:ios:e020622ee1c0c4f5ef4a2c</string>
+	<string>1:988811633989:ios:e9154a8a755c5192ef4a2c</string>
 </dict>
 </plist>

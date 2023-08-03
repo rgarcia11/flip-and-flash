@@ -63,7 +63,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyA_euMfE96lHXUe-9ARRA_L4hsFcQSIi6g',
-    appId: '1:988811633989:ios:db6c0f9472332ffdef4a2c',
+    appId: '1:988811633989:ios:e020622ee1c0c4f5ef4a2c',
     messagingSenderId: '988811633989',
     projectId: 'flip-and-flash',
     storageBucket: 'flip-and-flash.appspot.com',
