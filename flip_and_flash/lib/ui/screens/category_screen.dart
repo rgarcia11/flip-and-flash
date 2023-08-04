@@ -1,5 +1,6 @@
 import 'package:flip_and_flash/core/models/deck_model.dart';
 import 'package:flip_and_flash/core/services/database.dart';
+import 'package:flip_and_flash/ui/widgets/dialogs/add_deck_dialog.dart';
 import 'package:flip_and_flash/ui/screens/deck_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -39,31 +40,20 @@ class _CategoryScreenState extends State<CategoryScreen> {
           showDialog(
               context: context,
               builder: (BuildContext context) {
-                return Dialog(
-                  child: Container(
-                    child: Column(
-                      children: [
-                        TextField(
-                          onChanged: (value) {
-                            setState(() {
-                              newDeckName = value;
-                            });
-                          },
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            _db.createDeck(
-                                widget.categoryId,
-                                DeckModel(
-                                  name: newDeckName,
-                                ));
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('Add'),
-                        ),
-                      ],
-                    ),
-                  ),
+                return AddDeckDialog(
+                  textFieldOnChanged: (value) {
+                    setState(() {
+                      newDeckName = value!;
+                    });
+                  },
+                  submitDialog: () {
+                    _db.createDeck(
+                        widget.categoryId,
+                        DeckModel(
+                          name: newDeckName,
+                        ));
+                    Navigator.of(context).pop();
+                  },
                 );
               });
         },

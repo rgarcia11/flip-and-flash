@@ -2,7 +2,7 @@ import 'package:flip_and_flash/core/models/category_model.dart';
 import 'package:flip_and_flash/core/models/deck_model.dart';
 import 'package:flip_and_flash/core/models/flashcard_model.dart';
 import 'package:flip_and_flash/core/services/database.dart';
-import 'package:flip_and_flash/ui/dialogs/add_category_dialog.dart';
+import 'package:flip_and_flash/ui/widgets/dialogs/add_category_dialog.dart';
 import 'package:flip_and_flash/ui/screens/category_screen.dart';
 import 'package:flutter/material.dart';
 

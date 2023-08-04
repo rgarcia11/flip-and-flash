@@ -1,6 +1,7 @@
 import 'package:flip_and_flash/core/models/flashcard_model.dart';
 import 'package:flip_and_flash/core/services/database.dart';
 import 'package:flip_and_flash/ui/screens/flashcard_screen.dart';
+import 'package:flip_and_flash/ui/widgets/expandable_fab.dart';
 import 'package:flutter/material.dart';
 
 class DeckScreen extends StatefulWidget {
@@ -35,49 +36,54 @@ class _DeckScreenState extends State<DeckScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return Dialog(
-                  child: Container(
-                    child: Column(
-                      children: [
-                        TextField(
-                          onChanged: (value) {
-                            setState(() {
-                              newCardFrontside = value;
-                            });
-                          },
+      floatingActionButton: ExpandableFab(
+        distance: 50,
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Dialog(
+                      child: Container(
+                        child: Column(
+                          children: [
+                            TextField(
+                              onChanged: (value) {
+                                setState(() {
+                                  newCardFrontside = value;
+                                });
+                              },
+                            ),
+                            TextField(
+                              onChanged: (value) {
+                                setState(() {
+                                  newCardBackside = value;
+                                });
+                              },
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                _db.createFlashcard(
+                                    widget.categoryId,
+                                    widget.deckId,
+                                    FlashcardModel(
+                                      frontside: newCardFrontside,
+                                      backside: newCardBackside,
+                                    ));
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('Add'),
+                            ),
+                          ],
                         ),
-                        TextField(
-                          onChanged: (value) {
-                            setState(() {
-                              newCardBackside = value;
-                            });
-                          },
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            _db.createFlashcard(
-                                widget.categoryId,
-                                widget.deckId,
-                                FlashcardModel(
-                                  frontside: newCardFrontside,
-                                  backside: newCardBackside,
-                                ));
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('Add'),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              });
-        },
-        child: const Icon(Icons.school),
+                      ),
+                    );
+                  });
+            },
+            child: const Icon(Icons.add),
+          ),
+        ],
       ),
       appBar: AppBar(title: const Text('Flashcards')),
       body: GridView.builder(
