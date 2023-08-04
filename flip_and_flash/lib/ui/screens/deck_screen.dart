@@ -1,4 +1,3 @@
-import 'package:flip_and_flash/core/models/deck_model.dart';
 import 'package:flip_and_flash/core/models/flashcard_model.dart';
 import 'package:flip_and_flash/core/services/database.dart';
 import 'package:flip_and_flash/ui/screens/flashcard_screen.dart';
@@ -17,19 +16,14 @@ class _DeckScreenState extends State<DeckScreen> {
   List<FlashcardModel>? flashcards;
   final int crossAxisCount = 3;
 
-  void initialFetch() async {
-    DatabaseService db = DatabaseService();
-    flashcards = await db.getAllFlashcards(widget.categoryId, widget.deckId);
-    setState(() {});
+  String newCardFrontside = "";
+  String newCardBackside = "";
 
-    for (FlashcardModel flashcard in flashcards!) {
-      print("GATOOOOOOO 5");
-      print(flashcards);
-      print(flashcard);
-      print(flashcard.id);
-      print(flashcard.frontside);
-      print(flashcard.backside);
-    }
+  final DatabaseService _db = DatabaseService();
+
+  void initialFetch() async {
+    flashcards = await _db.getAllFlashcards(widget.categoryId, widget.deckId);
+    setState(() {});
   }
 
   @override
@@ -41,6 +35,50 @@ class _DeckScreenState extends State<DeckScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return Dialog(
+                  child: Container(
+                    child: Column(
+                      children: [
+                        TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              newCardFrontside = value;
+                            });
+                          },
+                        ),
+                        TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              newCardBackside = value;
+                            });
+                          },
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            _db.createFlashcard(
+                                widget.categoryId,
+                                widget.deckId,
+                                FlashcardModel(
+                                  frontside: newCardFrontside,
+                                  backside: newCardBackside,
+                                ));
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Add'),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              });
+        },
+        child: const Icon(Icons.school),
+      ),
       appBar: AppBar(title: const Text('Flashcards')),
       body: GridView.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

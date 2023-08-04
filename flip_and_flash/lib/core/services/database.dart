@@ -35,6 +35,10 @@ class DatabaseService {
     return categoryData;
   }
 
+  void createCategory(CategoryModel newCategory) async {
+    db.collection("categories").add(newCategory.toJson());
+  }
+
   Future<List<DeckModel>> getAllDecks(String categoryId) async {
     final snapshot = await db
         .collection("categories")
@@ -44,6 +48,14 @@ class DatabaseService {
     final deckData =
         snapshot.docs.map((e) => DeckModel.fromSnapshot(e)).toList();
     return deckData;
+  }
+
+  void createDeck(String categoryId, DeckModel newCategory) async {
+    db
+        .collection("categories")
+        .doc(categoryId)
+        .collection("decks")
+        .add(newCategory.toJson());
   }
 
   Future<List<FlashcardModel>> getAllFlashcards(
@@ -58,5 +70,16 @@ class DatabaseService {
     final deckData =
         snapshot.docs.map((e) => FlashcardModel.fromSnapshot(e)).toList();
     return deckData;
+  }
+
+  void createFlashcard(
+      String categoryId, String deckId, FlashcardModel newFlashcard) async {
+    db
+        .collection("categories")
+        .doc(categoryId)
+        .collection("decks")
+        .doc(deckId)
+        .collection("cards")
+        .add(newFlashcard.toJson());
   }
 }

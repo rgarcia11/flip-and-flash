@@ -16,9 +16,12 @@ class _CategoryScreenState extends State<CategoryScreen> {
   List<DeckModel>? decks;
   final int crossAxisCount = 2;
 
+  String newDeckName = "";
+
+  final DatabaseService _db = DatabaseService();
+
   void initialFetch() async {
-    DatabaseService db = DatabaseService();
-    decks = await db.getAllDecks(widget.categoryId);
+    decks = await _db.getAllDecks(widget.categoryId);
     setState(() {});
   }
 
@@ -31,6 +34,41 @@ class _CategoryScreenState extends State<CategoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return Dialog(
+                  child: Container(
+                    child: Column(
+                      children: [
+                        TextField(
+                          onChanged: (value) {
+                            setState(() {
+                              newDeckName = value;
+                            });
+                          },
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            _db.createDeck(
+                                widget.categoryId,
+                                DeckModel(
+                                  name: newDeckName,
+                                ));
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Add'),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              });
+        },
+        child: const Icon(Icons.add),
+      ),
       appBar: AppBar(title: const Text('Decks')),
       body: GridView.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
