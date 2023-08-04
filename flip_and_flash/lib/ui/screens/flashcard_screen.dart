@@ -1,5 +1,6 @@
 import 'package:flip_and_flash/core/models/deck_model.dart';
 import 'package:flip_and_flash/core/models/flashcard_model.dart';
+import 'package:flip_and_flash/core/services/database.dart';
 import 'package:flutter/material.dart';
 
 class FlashcardScreen extends StatefulWidget {
@@ -41,6 +42,10 @@ class FlashcardSideCard extends StatelessWidget {
         child: InkWell(
           onTap: () {
             // TODO: make it editable
+            print('GATOOO');
+            DatabaseService db = DatabaseService();
+            db.testAdd();
+            db.testRead();
           },
           child: Container(
             width: 300,

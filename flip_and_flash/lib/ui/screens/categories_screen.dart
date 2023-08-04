@@ -1,6 +1,7 @@
 import 'package:flip_and_flash/core/models/category_model.dart';
 import 'package:flip_and_flash/core/models/deck_model.dart';
 import 'package:flip_and_flash/core/models/flashcard_model.dart';
+import 'package:flip_and_flash/core/services/database.dart';
 import 'package:flip_and_flash/ui/screens/category_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -15,29 +16,18 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   final int crossAxisCount = 2;
   late List<FlashcardModel> cards;
   late List<DeckModel> decks;
-  late List<CategoryModel> categories;
+  List<CategoryModel>? categories;
+
+  void initialFetch() async {
+    DatabaseService db = DatabaseService();
+    categories = await db.getAllCategories();
+    setState(() {});
+  }
 
   @override
   void initState() {
-    // TODO: Fetch from Firebase
     super.initState();
-    cards = [
-      FlashcardModel('Travel(EN)', 'Travel(KR)'),
-      FlashcardModel('Eat(EN)', 'Eat(KR)', 100),
-      FlashcardModel('Sit(EN)', 'Sit(KR)', 80),
-    ];
-    decks = [
-      DeckModel('Verbs', cards),
-      DeckModel('Adjectives', cards),
-      DeckModel('Prepositions', cards),
-    ];
-    categories = [
-      CategoryModel('Korean', 'Korean', 'English', decks),
-      CategoryModel('Como dilatar el ano', 'Korean', 'English'),
-      CategoryModel('En serio, como me meto esos 40 cms de envergadura',
-          'Korean', 'English'),
-      CategoryModel('en verga dura juas', 'Korean', 'English'),
-    ];
+    initialFetch();
   }
 
   @override
@@ -48,11 +38,13 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: crossAxisCount),
           itemBuilder: (BuildContext context, index) {
-            return CategoryCard(
-              category: categories[index],
-            );
+            return categories != null
+                ? CategoryCard(
+                    category: categories![index],
+                  )
+                : Container();
           },
-          itemCount: categories.length),
+          itemCount: categories != null ? categories!.length : 0),
     );
   }
 }
@@ -71,7 +63,7 @@ class CategoryCard extends StatelessWidget {
               PageRouteBuilder(
                 pageBuilder: (context, animation, secondaryAnimation) =>
                     CategoryScreen(
-                  decks: category.decks,
+                  categoryId: category.id!,
                 ),
               ),
             );

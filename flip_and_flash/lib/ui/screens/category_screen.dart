@@ -1,17 +1,32 @@
 import 'package:flip_and_flash/core/models/deck_model.dart';
+import 'package:flip_and_flash/core/services/database.dart';
 import 'package:flip_and_flash/ui/screens/deck_screen.dart';
 import 'package:flutter/material.dart';
 
 class CategoryScreen extends StatefulWidget {
-  final List<DeckModel>? decks;
-  const CategoryScreen({this.decks, super.key});
+  final String categoryId;
+
+  const CategoryScreen({required this.categoryId, super.key});
 
   @override
   State<CategoryScreen> createState() => _CategoryScreenState();
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
+  List<DeckModel>? decks;
   final int crossAxisCount = 2;
+
+  void initialFetch() async {
+    DatabaseService db = DatabaseService();
+    decks = await db.getAllDecks(widget.categoryId);
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initialFetch();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,20 +36,22 @@ class _CategoryScreenState extends State<CategoryScreen> {
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: crossAxisCount),
           itemBuilder: (BuildContext context, index) {
-            return widget.decks != null
+            return decks != null
                 ? DeckCard(
-                    deck: widget.decks![index],
+                    categoryId: widget.categoryId,
+                    deck: decks![index],
                   )
-                : const DeckCard();
+                : Container();
           },
-          itemCount: widget.decks != null ? widget.decks!.length : 0),
+          itemCount: decks != null ? decks!.length : 0),
     );
   }
 }
 
 class DeckCard extends StatelessWidget {
-  final DeckModel? deck;
-  const DeckCard({this.deck, super.key});
+  final String categoryId;
+  final DeckModel deck;
+  const DeckCard({required this.categoryId, required this.deck, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +63,8 @@ class DeckCard extends StatelessWidget {
               PageRouteBuilder(
                 pageBuilder: (context, animation, secondaryAnimation) =>
                     DeckScreen(
-                  cards: deck!.cards,
+                  categoryId: categoryId,
+                  deckId: deck.id!,
                 ),
               ),
             );
@@ -56,7 +74,7 @@ class DeckCard extends StatelessWidget {
             height: 300,
             padding: const EdgeInsets.all(20.0),
             child: Center(
-              child: Text(deck != null ? deck!.name : ''),
+              child: Text(deck.name),
             ),
           ),
         ),
