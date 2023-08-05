@@ -82,4 +82,16 @@ class DatabaseService {
         .collection("cards")
         .add(newFlashcard.toJson());
   }
+
+  void editFlashcard(String categoryId, String deckId, String flashcardId,
+      FlashcardModel editedFlashcard) async {
+    db
+        .collection("categories")
+        .doc(categoryId)
+        .collection("decks")
+        .doc(deckId)
+        .collection("cards")
+        .doc(flashcardId)
+        .update(editedFlashcard.toJson());
+  }
 }

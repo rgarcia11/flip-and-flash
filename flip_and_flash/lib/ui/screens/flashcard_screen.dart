@@ -1,11 +1,16 @@
-import 'package:flip_and_flash/core/models/deck_model.dart';
 import 'package:flip_and_flash/core/models/flashcard_model.dart';
-import 'package:flip_and_flash/core/services/database.dart';
+import 'package:flip_and_flash/ui/screens/create_edit_flashcard_screen.dart';
 import 'package:flutter/material.dart';
 
 class FlashcardScreen extends StatefulWidget {
-  final FlashcardModel? flashcard;
-  const FlashcardScreen({this.flashcard, super.key});
+  final String categoryId;
+  final String deckId;
+  final FlashcardModel flashcard;
+  const FlashcardScreen(
+      {required this.categoryId,
+      required this.deckId,
+      required this.flashcard,
+      super.key});
 
   @override
   State<FlashcardScreen> createState() => _FlashcardScreenState();
@@ -13,50 +18,49 @@ class FlashcardScreen extends StatefulWidget {
 
 class _FlashcardScreenState extends State<FlashcardScreen> {
   final int crossAxisCount = 2;
+  bool flip = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('Flashcard')),
-        body: Column(
-          children: [
-            FlashcardSideCard(
-              side: widget.flashcard!.frontside,
-            ),
-            FlashcardSideCard(
-              side: widget.flashcard!.backside,
-            ),
-          ],
-        ));
-  }
-}
-
-class FlashcardSideCard extends StatelessWidget {
-  final String? side;
-  const FlashcardSideCard({this.side, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Card(
-        child: InkWell(
-          onTap: () {
-            // TODO: make it editable
-            print('GATOOO');
-            DatabaseService db = DatabaseService();
-            db.testAdd();
-            db.testRead();
-          },
-          child: Container(
-            width: 300,
-            height: 300,
-            padding: const EdgeInsets.all(20.0),
-            child: Center(
-              child: Text(side != null ? side! : ''),
+        appBar: AppBar(title: const Text('Flashcard'), actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      CreateFlashcardScreen(
+                    categoryId: widget.categoryId,
+                    deckId: widget.deckId,
+                    edit: true,
+                    flashcard: widget.flashcard,
+                  ),
+                ),
+              );
+            },
+            icon: const Icon(Icons.edit),
+          ),
+        ]),
+        body: Center(
+          child: Card(
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  flip = !flip;
+                });
+              },
+              child: Container(
+                width: 300,
+                height: 300,
+                padding: const EdgeInsets.all(20.0),
+                child: Center(
+                  child: Text(flip
+                      ? widget.flashcard.frontside
+                      : widget.flashcard.backside),
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }

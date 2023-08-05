@@ -1,5 +1,6 @@
 import 'package:flip_and_flash/core/models/flashcard_model.dart';
 import 'package:flip_and_flash/core/services/database.dart';
+import 'package:flip_and_flash/ui/screens/create_edit_flashcard_screen.dart';
 import 'package:flip_and_flash/ui/screens/flashcard_screen.dart';
 import 'package:flip_and_flash/ui/widgets/expandable_fab.dart';
 import 'package:flutter/material.dart';
@@ -37,49 +38,37 @@ class _DeckScreenState extends State<DeckScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: ExpandableFab(
-        distance: 50,
+        distance: 150,
         children: [
           FloatingActionButton(
+            heroTag: "innerFab1",
             onPressed: () {
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Dialog(
-                      child: Container(
-                        child: Column(
-                          children: [
-                            TextField(
-                              onChanged: (value) {
-                                setState(() {
-                                  newCardFrontside = value;
-                                });
-                              },
-                            ),
-                            TextField(
-                              onChanged: (value) {
-                                setState(() {
-                                  newCardBackside = value;
-                                });
-                              },
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                _db.createFlashcard(
-                                    widget.categoryId,
-                                    widget.deckId,
-                                    FlashcardModel(
-                                      frontside: newCardFrontside,
-                                      backside: newCardBackside,
-                                    ));
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('Add'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  });
+              // TODO: Study screen! (Flashcard scren with a twist)
+            },
+            child: const Icon(Icons.school),
+          ),
+          FloatingActionButton(
+            heroTag: "innerFab2",
+            onPressed: () {
+              // TODO: Study screen! (Flashcard scren with a twist)
+            },
+            child: const Icon(Icons.school),
+          ),
+          FloatingActionButton(
+            heroTag: "innerFab3",
+            onPressed: () {
+              // TODO: Study screen! (Flashcard scren with a twist)
+            },
+            child: const Icon(Icons.school),
+          ),
+          FloatingActionButton(
+            heroTag: "innerFab4",
+            onPressed: () {
+              Navigator.of(context).push(PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      CreateFlashcardScreen(
+                          categoryId: widget.categoryId,
+                          deckId: widget.deckId)));
             },
             child: const Icon(Icons.add),
           ),
@@ -92,9 +81,11 @@ class _DeckScreenState extends State<DeckScreen> {
           itemBuilder: (BuildContext context, index) {
             return flashcards != null
                 ? FlashcardCard(
+                    categoryId: widget.categoryId,
+                    deckId: widget.deckId,
                     flashcard: flashcards![index],
                   )
-                : const FlashcardCard();
+                : const Placeholder();
           },
           itemCount: flashcards != null ? flashcards!.length : 0),
     );
@@ -102,8 +93,14 @@ class _DeckScreenState extends State<DeckScreen> {
 }
 
 class FlashcardCard extends StatelessWidget {
-  final FlashcardModel? flashcard;
-  const FlashcardCard({this.flashcard, super.key});
+  final String categoryId;
+  final String deckId;
+  final FlashcardModel flashcard;
+  const FlashcardCard(
+      {required this.categoryId,
+      required this.deckId,
+      required this.flashcard,
+      super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -115,6 +112,8 @@ class FlashcardCard extends StatelessWidget {
               PageRouteBuilder(
                 pageBuilder: (context, animation, secondaryAnimation) =>
                     FlashcardScreen(
+                  categoryId: categoryId,
+                  deckId: deckId,
                   flashcard: flashcard,
                 ),
               ),
@@ -125,7 +124,7 @@ class FlashcardCard extends StatelessWidget {
             height: 300,
             padding: const EdgeInsets.all(20.0),
             child: Center(
-              child: Text(flashcard != null ? flashcard!.frontside : ''),
+              child: Text(flashcard.frontside),
             ),
           ),
         ),
