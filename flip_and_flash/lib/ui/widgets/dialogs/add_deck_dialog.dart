@@ -38,6 +38,5 @@ class AddDeckDialog extends StatelessWidget {
         ),
       ),
     );
-    ;
   }
 }

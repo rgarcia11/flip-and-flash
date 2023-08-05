@@ -88,7 +88,7 @@ class _CreateEditFlashcardScreenState extends State<CreateEditFlashcardScreen> {
       body: Column(
         children: [
           FlashcardSideCard(
-            text: "Enter backside word or value",
+            text: "Enter frontside word or value",
             textController: frontsideTextController,
             onChanged: (value) {
               setState(() {

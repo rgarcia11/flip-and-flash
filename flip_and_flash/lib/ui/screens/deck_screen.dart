@@ -2,6 +2,7 @@ import 'package:flip_and_flash/core/models/deck_model.dart';
 import 'package:flip_and_flash/core/models/flashcard_model.dart';
 import 'package:flip_and_flash/core/services/database.dart';
 import 'package:flip_and_flash/ui/screens/create_edit_flashcard_screen.dart';
+import 'package:flip_and_flash/ui/screens/edit_deck_screen.dart';
 import 'package:flip_and_flash/ui/screens/flashcard_screen.dart';
 import 'package:flip_and_flash/ui/widgets/expandable_fab.dart';
 import 'package:flutter/material.dart';
@@ -38,29 +39,69 @@ class _DeckScreenState extends State<DeckScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // TODO: Swap for flow: https://api.flutter.dev/flutter/widgets/Flow-class.html
       floatingActionButton: ExpandableFab(
-        distance: 150,
+        distance: 200,
         children: [
-          FloatingActionButton(
+          FloatingActionButton.extended(
             heroTag: "innerFab1",
+            label: const Text("Study 1 card"),
             onPressed: () {
-              // TODO: Study screen! (Flashcard scren with a twist)
+              // TODO: select 20 random cards
+              // TODO: not so random... select more frequently the ones least learned
+              // TODO: make a mechanism that allows for back to back FlashcardScreens when popping or navigating
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      FlashcardScreen(
+                    categoryId: widget.categoryId,
+                    deckId: widget.deck.id!,
+                    flashcard: flashcards!.first,
+                  ),
+                ),
+              );
             },
-            child: const Icon(Icons.school),
+            icon: const Icon(Icons.school),
           ),
-          FloatingActionButton(
+          FloatingActionButton.extended(
             heroTag: "innerFab2",
+            label: const Text("Study 10 cards"),
             onPressed: () {
-              // TODO: Study screen! (Flashcard scren with a twist)
+              // TODO: select 20 random cards
+              // TODO: not so random... select more frequently the ones least learned
+              // TODO: make a mechanism that allows for back to back FlashcardScreens when popping or navigating
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      FlashcardScreen(
+                    categoryId: widget.categoryId,
+                    deckId: widget.deck.id!,
+                    flashcard: flashcards!.first,
+                  ),
+                ),
+              );
             },
-            child: const Icon(Icons.school),
+            icon: const Icon(Icons.school),
           ),
-          FloatingActionButton(
+          FloatingActionButton.extended(
             heroTag: "innerFab3",
+            label: const Text("Study 20 cards"),
             onPressed: () {
-              // TODO: Study screen! (Flashcard scren with a twist)
+              // TODO: select 20 random cards
+              // TODO: not so random... select more frequently the ones least learned
+              // TODO: make a mechanism that allows for back to back FlashcardScreens when popping or navigating
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      FlashcardScreen(
+                    categoryId: widget.categoryId,
+                    deckId: widget.deck.id!,
+                    flashcard: flashcards!.first,
+                  ),
+                ),
+              );
             },
-            child: const Icon(Icons.school),
+            icon: const Icon(Icons.school),
           ),
           FloatingActionButton(
             heroTag: "innerFab4",
@@ -80,18 +121,13 @@ class _DeckScreenState extends State<DeckScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              // TODO: Edit Deck
-              // Navigator.of(context).push(
-              //   PageRouteBuilder(
-              //     pageBuilder: (context, animation, secondaryAnimation) =>
-              //         CreateFlashcardScreen(
-              //       categoryId: widget.categoryId,
-              //       deckId: widget.deckId,
-              //       edit: true,
-              //       flashcard: widget.flashcard,
-              //     ),
-              //   ),
-              // );
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      EditDeckScreen(
+                          categoryId: widget.categoryId, deck: widget.deck),
+                ),
+              );
             },
             icon: const Icon(Icons.edit),
           ),

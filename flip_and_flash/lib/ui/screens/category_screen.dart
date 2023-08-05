@@ -1,6 +1,7 @@
 import 'package:flip_and_flash/core/models/category_model.dart';
 import 'package:flip_and_flash/core/models/deck_model.dart';
 import 'package:flip_and_flash/core/services/database.dart';
+import 'package:flip_and_flash/ui/screens/edit_category_screen.dart';
 import 'package:flip_and_flash/ui/widgets/dialogs/add_deck_dialog.dart';
 import 'package:flip_and_flash/ui/screens/deck_screen.dart';
 import 'package:flutter/material.dart';
@@ -65,18 +66,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              // TODO: Edit category
-              // Navigator.of(context).push(
-              //   PageRouteBuilder(
-              //     pageBuilder: (context, animation, secondaryAnimation) =>
-              //         CreateFlashcardScreen(
-              //       categoryId: widget.categoryId,
-              //       deckId: widget.deckId,
-              //       edit: true,
-              //       flashcard: widget.flashcard,
-              //     ),
-              //   ),
-              // );
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        EditCategoryScreen(category: widget.category)),
+              );
             },
             icon: const Icon(Icons.edit),
           ),

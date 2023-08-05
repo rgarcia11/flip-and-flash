@@ -41,6 +41,21 @@ class DatabaseService {
     db.collection("categories").add(newCategory.toJson());
   }
 
+  void editCategory(
+    CategoryModel editedCategory,
+  ) async {
+    db
+        .collection("categories")
+        .doc(editedCategory.id)
+        .update(editedCategory.toJson());
+  }
+
+  void deleteCategory(
+    String deletedCategoryId,
+  ) async {
+    db.collection("categories").doc(deletedCategoryId).delete();
+  }
+
   Future<List<DeckModel>> getAllDecks(
     String categoryId,
   ) async {
@@ -56,13 +71,37 @@ class DatabaseService {
 
   void createDeck(
     String categoryId,
-    DeckModel newCategory,
+    DeckModel newDeck,
   ) async {
     db
         .collection("categories")
         .doc(categoryId)
         .collection("decks")
-        .add(newCategory.toJson());
+        .add(newDeck.toJson());
+  }
+
+  void editDeck(
+    String categoryId,
+    DeckModel editedDeck,
+  ) async {
+    db
+        .collection("categories")
+        .doc(categoryId)
+        .collection("decks")
+        .doc(editedDeck.id)
+        .update(editedDeck.toJson());
+  }
+
+  void deleteDeck(
+    String categoryId,
+    String deckId,
+  ) async {
+    db
+        .collection("categories")
+        .doc(categoryId)
+        .collection("decks")
+        .doc(deckId)
+        .delete();
   }
 
   Future<List<FlashcardModel>> getAllFlashcards(
