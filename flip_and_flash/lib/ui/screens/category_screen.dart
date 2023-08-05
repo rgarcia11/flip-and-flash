@@ -1,3 +1,4 @@
+import 'package:flip_and_flash/core/models/category_model.dart';
 import 'package:flip_and_flash/core/models/deck_model.dart';
 import 'package:flip_and_flash/core/services/database.dart';
 import 'package:flip_and_flash/ui/widgets/dialogs/add_deck_dialog.dart';
@@ -5,9 +6,9 @@ import 'package:flip_and_flash/ui/screens/deck_screen.dart';
 import 'package:flutter/material.dart';
 
 class CategoryScreen extends StatefulWidget {
-  final String categoryId;
+  final CategoryModel category;
 
-  const CategoryScreen({required this.categoryId, super.key});
+  const CategoryScreen({required this.category, super.key});
 
   @override
   State<CategoryScreen> createState() => _CategoryScreenState();
@@ -22,7 +23,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
   final DatabaseService _db = DatabaseService();
 
   void initialFetch() async {
-    decks = await _db.getAllDecks(widget.categoryId);
+    decks = await _db.getAllDecks(widget.category.id!);
     setState(() {});
   }
 
@@ -48,7 +49,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   },
                   submitDialog: () {
                     _db.createDeck(
-                        widget.categoryId,
+                        widget.category.id!,
                         DeckModel(
                           name: newDeckName,
                         ));
@@ -59,14 +60,35 @@ class _CategoryScreenState extends State<CategoryScreen> {
         },
         child: const Icon(Icons.add),
       ),
-      appBar: AppBar(title: const Text('Decks')),
+      appBar: AppBar(
+        title: Text('Decks in ${widget.category.name}'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              // TODO: Edit category
+              // Navigator.of(context).push(
+              //   PageRouteBuilder(
+              //     pageBuilder: (context, animation, secondaryAnimation) =>
+              //         CreateFlashcardScreen(
+              //       categoryId: widget.categoryId,
+              //       deckId: widget.deckId,
+              //       edit: true,
+              //       flashcard: widget.flashcard,
+              //     ),
+              //   ),
+              // );
+            },
+            icon: const Icon(Icons.edit),
+          ),
+        ],
+      ),
       body: GridView.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: crossAxisCount),
           itemBuilder: (BuildContext context, index) {
             return decks != null
                 ? DeckCard(
-                    categoryId: widget.categoryId,
+                    categoryId: widget.category.id!,
                     deck: decks![index],
                   )
                 : Container();
@@ -92,7 +114,7 @@ class DeckCard extends StatelessWidget {
                 pageBuilder: (context, animation, secondaryAnimation) =>
                     DeckScreen(
                   categoryId: categoryId,
-                  deckId: deck.id!,
+                  deck: deck,
                 ),
               ),
             );

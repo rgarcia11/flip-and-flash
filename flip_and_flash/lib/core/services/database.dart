@@ -35,11 +35,15 @@ class DatabaseService {
     return categoryData;
   }
 
-  void createCategory(CategoryModel newCategory) async {
+  void createCategory(
+    CategoryModel newCategory,
+  ) async {
     db.collection("categories").add(newCategory.toJson());
   }
 
-  Future<List<DeckModel>> getAllDecks(String categoryId) async {
+  Future<List<DeckModel>> getAllDecks(
+    String categoryId,
+  ) async {
     final snapshot = await db
         .collection("categories")
         .doc(categoryId)
@@ -50,7 +54,10 @@ class DatabaseService {
     return deckData;
   }
 
-  void createDeck(String categoryId, DeckModel newCategory) async {
+  void createDeck(
+    String categoryId,
+    DeckModel newCategory,
+  ) async {
     db
         .collection("categories")
         .doc(categoryId)
@@ -59,7 +66,9 @@ class DatabaseService {
   }
 
   Future<List<FlashcardModel>> getAllFlashcards(
-      String categoryId, String deckId) async {
+    String categoryId,
+    String deckId,
+  ) async {
     final snapshot = await db
         .collection("categories")
         .doc(categoryId)
@@ -73,7 +82,10 @@ class DatabaseService {
   }
 
   void createFlashcard(
-      String categoryId, String deckId, FlashcardModel newFlashcard) async {
+    String categoryId,
+    String deckId,
+    FlashcardModel newFlashcard,
+  ) async {
     db
         .collection("categories")
         .doc(categoryId)
@@ -83,8 +95,12 @@ class DatabaseService {
         .add(newFlashcard.toJson());
   }
 
-  void editFlashcard(String categoryId, String deckId, String flashcardId,
-      FlashcardModel editedFlashcard) async {
+  void editFlashcard(
+    String categoryId,
+    String deckId,
+    String flashcardId,
+    FlashcardModel editedFlashcard,
+  ) async {
     db
         .collection("categories")
         .doc(categoryId)
@@ -93,5 +109,20 @@ class DatabaseService {
         .collection("cards")
         .doc(flashcardId)
         .update(editedFlashcard.toJson());
+  }
+
+  void deleteFlashcard(
+    String categoryId,
+    String deckId,
+    String flashcardId,
+  ) async {
+    db
+        .collection("categories")
+        .doc(categoryId)
+        .collection("decks")
+        .doc(deckId)
+        .collection("cards")
+        .doc(flashcardId)
+        .delete();
   }
 }

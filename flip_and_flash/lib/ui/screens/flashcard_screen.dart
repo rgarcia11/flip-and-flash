@@ -23,24 +23,27 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('Flashcard'), actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      CreateFlashcardScreen(
-                    categoryId: widget.categoryId,
-                    deckId: widget.deckId,
-                    edit: true,
-                    flashcard: widget.flashcard,
+        appBar: AppBar(
+          title: const Text('Flashcard'),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        CreateEditFlashcardScreen(
+                      categoryId: widget.categoryId,
+                      deckId: widget.deckId,
+                      edit: true,
+                      flashcard: widget.flashcard,
+                    ),
                   ),
-                ),
-              );
-            },
-            icon: const Icon(Icons.edit),
-          ),
-        ]),
+                );
+              },
+              icon: const Icon(Icons.edit),
+            ),
+          ],
+        ),
         body: Center(
           child: Card(
             child: InkWell(

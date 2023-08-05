@@ -3,13 +3,13 @@ import 'package:flip_and_flash/core/services/database.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
-class CreateFlashcardScreen extends StatefulWidget {
+class CreateEditFlashcardScreen extends StatefulWidget {
   final String categoryId;
   final String deckId;
   final bool edit;
   FlashcardModel? flashcard;
 
-  CreateFlashcardScreen(
+  CreateEditFlashcardScreen(
       {required this.categoryId,
       required this.deckId,
       this.edit = false,
@@ -20,10 +20,11 @@ class CreateFlashcardScreen extends StatefulWidget {
             If edit mode is false, you shouldn't provide a flashcard model.""");
 
   @override
-  State<CreateFlashcardScreen> createState() => _CreateFlashcardScreenState();
+  State<CreateEditFlashcardScreen> createState() =>
+      _CreateEditFlashcardScreenState();
 }
 
-class _CreateFlashcardScreenState extends State<CreateFlashcardScreen> {
+class _CreateEditFlashcardScreenState extends State<CreateEditFlashcardScreen> {
   final DatabaseService _db = DatabaseService();
 
   String? frontsideValue;
@@ -68,8 +69,22 @@ class _CreateFlashcardScreenState extends State<CreateFlashcardScreen> {
             }
           },
           child: Icon(widget.edit ? Icons.check : Icons.add)),
-      appBar:
-          AppBar(title: Text(widget.edit ? "Edit flashcard" : "New flashcard")),
+      appBar: AppBar(
+        title: Text(widget.edit ? "Edit flashcard" : "New flashcard"),
+        actions: widget.edit
+            ? [
+                IconButton(
+                  onPressed: () {
+                    _db.deleteFlashcard(widget.categoryId, widget.deckId,
+                        widget.flashcard!.id!);
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                  },
+                  icon: const Icon(Icons.delete),
+                ),
+              ]
+            : [],
+      ),
       body: Column(
         children: [
           FlashcardSideCard(

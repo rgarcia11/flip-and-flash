@@ -117,7 +117,7 @@ class CategoryCard extends StatelessWidget {
               PageRouteBuilder(
                 pageBuilder: (context, animation, secondaryAnimation) =>
                     CategoryScreen(
-                  categoryId: category.id!,
+                  category: category,
                 ),
               ),
             );

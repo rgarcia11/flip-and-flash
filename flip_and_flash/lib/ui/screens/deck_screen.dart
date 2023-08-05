@@ -1,3 +1,4 @@
+import 'package:flip_and_flash/core/models/deck_model.dart';
 import 'package:flip_and_flash/core/models/flashcard_model.dart';
 import 'package:flip_and_flash/core/services/database.dart';
 import 'package:flip_and_flash/ui/screens/create_edit_flashcard_screen.dart';
@@ -7,8 +8,8 @@ import 'package:flutter/material.dart';
 
 class DeckScreen extends StatefulWidget {
   final String categoryId;
-  final String deckId;
-  const DeckScreen({required this.categoryId, required this.deckId, super.key});
+  final DeckModel deck;
+  const DeckScreen({required this.categoryId, required this.deck, super.key});
 
   @override
   State<DeckScreen> createState() => _DeckScreenState();
@@ -24,7 +25,7 @@ class _DeckScreenState extends State<DeckScreen> {
   final DatabaseService _db = DatabaseService();
 
   void initialFetch() async {
-    flashcards = await _db.getAllFlashcards(widget.categoryId, widget.deckId);
+    flashcards = await _db.getAllFlashcards(widget.categoryId, widget.deck.id!);
     setState(() {});
   }
 
@@ -66,15 +67,36 @@ class _DeckScreenState extends State<DeckScreen> {
             onPressed: () {
               Navigator.of(context).push(PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      CreateFlashcardScreen(
+                      CreateEditFlashcardScreen(
                           categoryId: widget.categoryId,
-                          deckId: widget.deckId)));
+                          deckId: widget.deck.id!)));
             },
             child: const Icon(Icons.add),
           ),
         ],
       ),
-      appBar: AppBar(title: const Text('Flashcards')),
+      appBar: AppBar(
+        title: Text('Flashcards in ${widget.deck.name}'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              // TODO: Edit Deck
+              // Navigator.of(context).push(
+              //   PageRouteBuilder(
+              //     pageBuilder: (context, animation, secondaryAnimation) =>
+              //         CreateFlashcardScreen(
+              //       categoryId: widget.categoryId,
+              //       deckId: widget.deckId,
+              //       edit: true,
+              //       flashcard: widget.flashcard,
+              //     ),
+              //   ),
+              // );
+            },
+            icon: const Icon(Icons.edit),
+          ),
+        ],
+      ),
       body: GridView.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: crossAxisCount),
@@ -82,7 +104,7 @@ class _DeckScreenState extends State<DeckScreen> {
             return flashcards != null
                 ? FlashcardCard(
                     categoryId: widget.categoryId,
-                    deckId: widget.deckId,
+                    deckId: widget.deck.id!,
                     flashcard: flashcards![index],
                   )
                 : const Placeholder();
