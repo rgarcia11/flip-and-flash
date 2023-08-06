@@ -9,12 +9,14 @@ class FlashcardsScreen extends StatefulWidget {
   final String deckId;
   final List<FlashcardModel> flashcards;
   final bool studyMode;
+  final bool flip;
 
   const FlashcardsScreen(
       {required this.categoryId,
       required this.deckId,
       required this.flashcards,
       this.studyMode = true,
+      this.flip = false,
       super.key});
 
   @override
@@ -23,10 +25,16 @@ class FlashcardsScreen extends StatefulWidget {
 
 class _FlashcardsScreenState extends State<FlashcardsScreen> {
   final int crossAxisCount = 2;
-  bool flip = false;
+  late bool flip;
   int _currentCardIndex = 0;
   double _currentSliderValue = 0;
   final DatabaseService _db = DatabaseService();
+
+  @override
+  void initState() {
+    super.initState();
+    flip = widget.flip;
+  }
 
   @override
   Widget build(BuildContext context) {

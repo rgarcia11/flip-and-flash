@@ -21,6 +21,7 @@ class DeckScreen extends StatefulWidget {
 class _DeckScreenState extends State<DeckScreen> {
   List<FlashcardModel>? flashcards;
   final int crossAxisCount = 3;
+  bool flip = false;
 
   final DatabaseService _db = DatabaseService();
 
@@ -54,6 +55,7 @@ class _DeckScreenState extends State<DeckScreen> {
                     categoryId: widget.categoryId,
                     deckId: widget.deck.id!,
                     flashcards: flashcardList,
+                    flip: flip,
                   ),
                 ),
               );
@@ -72,6 +74,7 @@ class _DeckScreenState extends State<DeckScreen> {
                     categoryId: widget.categoryId,
                     deckId: widget.deck.id!,
                     flashcards: flashcardList,
+                    flip: flip,
                   ),
                 ),
               );
@@ -90,6 +93,7 @@ class _DeckScreenState extends State<DeckScreen> {
                     categoryId: widget.categoryId,
                     deckId: widget.deck.id!,
                     flashcards: flashcardList,
+                    flip: flip,
                   ),
                 ),
               );
@@ -99,11 +103,14 @@ class _DeckScreenState extends State<DeckScreen> {
           FloatingActionButton(
             heroTag: "innerFab4",
             onPressed: () {
-              Navigator.of(context).push(PageRouteBuilder(
+              Navigator.of(context).push(
+                PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
                       CreateEditFlashcardScreen(
                           categoryId: widget.categoryId,
-                          deckId: widget.deck.id!)));
+                          deckId: widget.deck.id!),
+                ),
+              );
             },
             child: const Icon(Icons.add),
           ),
@@ -114,15 +121,53 @@ class _DeckScreenState extends State<DeckScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.of(context).push(
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      EditDeckScreen(
-                          categoryId: widget.categoryId, deck: widget.deck),
-                ),
-              );
+              showModalBottomSheet(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Wrap(
+                      children: [
+                        ListTile(
+                          title: const Text('Edit deck'),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        EditDeckScreen(
+                                            categoryId: widget.categoryId,
+                                            deck: widget.deck),
+                              ),
+                            );
+                          },
+                        ),
+                        ListTile(
+                          title: const Text('Add flashcard'),
+                          onTap: () {
+                            Navigator.of(context).push(
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        CreateEditFlashcardScreen(
+                                            categoryId: widget.categoryId,
+                                            deckId: widget.deck.id!),
+                              ),
+                            );
+                          },
+                        ),
+                        ListTile(
+                          title: const Text("Flip side"),
+                          onTap: () {
+                            setState(() {
+                              flip = !flip;
+                            });
+                          },
+                        ),
+                        const ListTile(),
+                      ],
+                    );
+                  });
             },
-            icon: const Icon(Icons.edit),
+            icon: const Icon(Icons.segment),
           ),
         ],
       ),
@@ -135,6 +180,7 @@ class _DeckScreenState extends State<DeckScreen> {
                     categoryId: widget.categoryId,
                     deckId: widget.deck.id!,
                     flashcard: flashcards![index],
+                    flip: flip,
                   )
                 : const Placeholder();
           },
@@ -176,10 +222,12 @@ class FlashcardCard extends StatelessWidget {
   final String categoryId;
   final String deckId;
   final FlashcardModel flashcard;
+  final bool flip;
   const FlashcardCard(
       {required this.categoryId,
       required this.deckId,
       required this.flashcard,
+      required this.flip,
       super.key});
 
   @override
@@ -196,6 +244,7 @@ class FlashcardCard extends StatelessWidget {
                   deckId: deckId,
                   flashcards: [flashcard],
                   studyMode: false,
+                  flip: flip,
                 ),
               ),
             );
@@ -204,10 +253,13 @@ class FlashcardCard extends StatelessWidget {
             width: 300,
             height: 300,
             decoration: BoxDecoration(
-                border: Border.all(color: getLearnedColor(flashcard.learned))),
+              border: Border.all(
+                color: getLearnedColor(flashcard.learned),
+              ),
+            ),
             padding: const EdgeInsets.all(20.0),
             child: Center(
-              child: Text(flashcard.frontside),
+              child: Text(flip ? flashcard.backside : flashcard.frontside),
             ),
           ),
         ),
