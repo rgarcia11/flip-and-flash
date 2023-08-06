@@ -24,7 +24,7 @@ class FlashcardModel {
       id: document.id,
       frontside: data["Frontside"],
       backside: data["Backside"],
-      learned: data["Learnedside"],
+      learned: data["Learned"],
     );
   }
 }

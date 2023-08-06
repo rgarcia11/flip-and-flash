@@ -1,9 +1,11 @@
+import 'dart:math';
+
 import 'package:flip_and_flash/core/models/deck_model.dart';
 import 'package:flip_and_flash/core/models/flashcard_model.dart';
 import 'package:flip_and_flash/core/services/database.dart';
 import 'package:flip_and_flash/ui/screens/create_edit_flashcard_screen.dart';
 import 'package:flip_and_flash/ui/screens/edit_deck_screen.dart';
-import 'package:flip_and_flash/ui/screens/flashcard_screen.dart';
+import 'package:flip_and_flash/ui/screens/flashcards_screen.dart';
 import 'package:flip_and_flash/ui/widgets/expandable_fab.dart';
 import 'package:flutter/material.dart';
 
@@ -19,9 +21,6 @@ class DeckScreen extends StatefulWidget {
 class _DeckScreenState extends State<DeckScreen> {
   List<FlashcardModel>? flashcards;
   final int crossAxisCount = 3;
-
-  String newCardFrontside = "";
-  String newCardBackside = "";
 
   final DatabaseService _db = DatabaseService();
 
@@ -47,16 +46,14 @@ class _DeckScreenState extends State<DeckScreen> {
             heroTag: "innerFab1",
             label: const Text("Study 1 card"),
             onPressed: () {
-              // TODO: select 20 random cards
-              // TODO: not so random... select more frequently the ones least learned
-              // TODO: make a mechanism that allows for back to back FlashcardScreens when popping or navigating
+              List<FlashcardModel> flashcardList = formStudyFlashcards(1);
               Navigator.of(context).push(
                 PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      FlashcardScreen(
+                      FlashcardsScreen(
                     categoryId: widget.categoryId,
                     deckId: widget.deck.id!,
-                    flashcard: flashcards!.first,
+                    flashcards: flashcardList,
                   ),
                 ),
               );
@@ -67,16 +64,14 @@ class _DeckScreenState extends State<DeckScreen> {
             heroTag: "innerFab2",
             label: const Text("Study 10 cards"),
             onPressed: () {
-              // TODO: select 20 random cards
-              // TODO: not so random... select more frequently the ones least learned
-              // TODO: make a mechanism that allows for back to back FlashcardScreens when popping or navigating
+              List<FlashcardModel> flashcardList = formStudyFlashcards(10);
               Navigator.of(context).push(
                 PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      FlashcardScreen(
+                      FlashcardsScreen(
                     categoryId: widget.categoryId,
                     deckId: widget.deck.id!,
-                    flashcard: flashcards!.first,
+                    flashcards: flashcardList,
                   ),
                 ),
               );
@@ -87,16 +82,14 @@ class _DeckScreenState extends State<DeckScreen> {
             heroTag: "innerFab3",
             label: const Text("Study 20 cards"),
             onPressed: () {
-              // TODO: select 20 random cards
-              // TODO: not so random... select more frequently the ones least learned
-              // TODO: make a mechanism that allows for back to back FlashcardScreens when popping or navigating
+              List<FlashcardModel> flashcardList = formStudyFlashcards(20);
               Navigator.of(context).push(
                 PageRouteBuilder(
                   pageBuilder: (context, animation, secondaryAnimation) =>
-                      FlashcardScreen(
+                      FlashcardsScreen(
                     categoryId: widget.categoryId,
                     deckId: widget.deck.id!,
-                    flashcard: flashcards!.first,
+                    flashcards: flashcardList,
                   ),
                 ),
               );
@@ -148,6 +141,35 @@ class _DeckScreenState extends State<DeckScreen> {
           itemCount: flashcards != null ? flashcards!.length : 0),
     );
   }
+
+  List<FlashcardModel> formStudyFlashcards(int num) {
+    List<FlashcardModel> flashcardList = [];
+    while (flashcardList.length < num) {
+      int rD = Random().nextInt(15);
+      int rI = Random().nextInt(flashcards!.length);
+      bool add = false;
+      if (rD <= 4 && flashcards![rI].learned == 0 ||
+          flashcards![rI].learned == null) {
+        add = true;
+      }
+      if (rD >= 5 && rD <= 8 && flashcards![rI].learned == 25) {
+        add = true;
+      }
+      if (rD >= 9 && rD <= 11 && flashcards![rI].learned == 50) {
+        add = true;
+      }
+      if (rD >= 12 && rD <= 13 && flashcards![rI].learned == 75) {
+        add = true;
+      }
+      if (rD == 14 && flashcards![rI].learned == 100) {
+        add = true;
+      }
+      if (add) {
+        flashcardList.add(flashcards![rI]);
+      }
+    }
+    return flashcardList;
+  }
 }
 
 class FlashcardCard extends StatelessWidget {
@@ -169,10 +191,11 @@ class FlashcardCard extends StatelessWidget {
             Navigator.of(context).push(
               PageRouteBuilder(
                 pageBuilder: (context, animation, secondaryAnimation) =>
-                    FlashcardScreen(
+                    FlashcardsScreen(
                   categoryId: categoryId,
                   deckId: deckId,
-                  flashcard: flashcard,
+                  flashcards: [flashcard],
+                  studyMode: false,
                 ),
               ),
             );
@@ -180,6 +203,8 @@ class FlashcardCard extends StatelessWidget {
           child: Container(
             width: 300,
             height: 300,
+            decoration: BoxDecoration(
+                border: Border.all(color: getLearnedColor(flashcard.learned))),
             padding: const EdgeInsets.all(20.0),
             child: Center(
               child: Text(flashcard.frontside),
@@ -189,4 +214,26 @@ class FlashcardCard extends StatelessWidget {
       ),
     );
   }
+}
+
+Color getLearnedColor(int? learned) {
+  Color color;
+  switch (learned) {
+    case 25:
+      color = const Color(0xFFFFD270);
+      break;
+    case 50:
+      color = const Color(0xFFD9FF70);
+      break;
+    case 75:
+      color = const Color(0xFF72FF70);
+      break;
+    case 100:
+      color = const Color(0xFF70C8FF);
+      break;
+    default:
+      color = const Color(0xFFFF7570);
+      break;
+  }
+  return color;
 }
