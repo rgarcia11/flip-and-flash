@@ -1,10 +1,12 @@
 import 'package:flip_and_flash/core/models/category_model.dart';
 import 'package:flip_and_flash/core/models/deck_model.dart';
+import 'package:flip_and_flash/core/providers/deck_provider.dart';
 import 'package:flip_and_flash/core/services/database.dart';
 import 'package:flip_and_flash/ui/screens/edit_category_screen.dart';
 import 'package:flip_and_flash/ui/widgets/dialogs/add_deck_dialog.dart';
 import 'package:flip_and_flash/ui/screens/deck_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class CategoryScreen extends StatefulWidget {
   final CategoryModel category;
@@ -16,22 +18,15 @@ class CategoryScreen extends StatefulWidget {
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
-  List<DeckModel>? decks;
   final int crossAxisCount = 2;
 
   String newDeckName = "";
 
   final DatabaseService _db = DatabaseService();
 
-  void initialFetch() async {
-    decks = await _db.getAllDecks(widget.category.id!);
-    setState(() {});
-  }
-
   @override
   void initState() {
     super.initState();
-    initialFetch();
   }
 
   @override
@@ -76,18 +71,23 @@ class _CategoryScreenState extends State<CategoryScreen> {
           ),
         ],
       ),
-      body: GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount),
-          itemBuilder: (BuildContext context, index) {
-            return decks != null
-                ? DeckCard(
-                    categoryId: widget.category.id!,
-                    deck: decks![index],
-                  )
-                : Container();
-          },
-          itemCount: decks != null ? decks!.length : 0),
+      body: Consumer<DeckProvider>(
+          builder: (BuildContext context, DeckProvider deckProvider, _) {
+        deckProvider.getAllDecks(widget.category.id!);
+        return GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount),
+            itemBuilder: (BuildContext context, index) {
+              return deckProvider.decks.isNotEmpty
+                  ? DeckCard(
+                      categoryId: widget.category.id!,
+                      deck: deckProvider.decks[index],
+                    )
+                  : Container();
+            },
+            itemCount:
+                deckProvider.decks.isNotEmpty ? deckProvider.decks.length : 0);
+      }),
     );
   }
 }

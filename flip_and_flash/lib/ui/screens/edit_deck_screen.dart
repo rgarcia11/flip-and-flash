@@ -40,6 +40,7 @@ class EditDeckScreenState extends State<EditDeckScreen> {
                   name: nameTextController.text,
                 ));
             Navigator.of(context).pop();
+            // TODO: Needs to pop until category screen
           },
           child: const Icon(Icons.check)),
       appBar: AppBar(

@@ -2,12 +2,13 @@ import 'dart:math';
 
 import 'package:flip_and_flash/core/models/deck_model.dart';
 import 'package:flip_and_flash/core/models/flashcard_model.dart';
-import 'package:flip_and_flash/core/services/database.dart';
+import 'package:flip_and_flash/core/providers/flashcard_provider.dart';
 import 'package:flip_and_flash/ui/screens/create_edit_flashcard_screen.dart';
 import 'package:flip_and_flash/ui/screens/edit_deck_screen.dart';
 import 'package:flip_and_flash/ui/screens/flashcards_screen.dart';
 import 'package:flip_and_flash/ui/widgets/expandable_fab.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DeckScreen extends StatefulWidget {
   final String categoryId;
@@ -19,22 +20,8 @@ class DeckScreen extends StatefulWidget {
 }
 
 class _DeckScreenState extends State<DeckScreen> {
-  List<FlashcardModel>? flashcards;
   final int crossAxisCount = 3;
   bool flip = false;
-
-  final DatabaseService _db = DatabaseService();
-
-  void initialFetch() async {
-    flashcards = await _db.getAllFlashcards(widget.categoryId, widget.deck.id!);
-    setState(() {});
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    initialFetch();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -171,47 +158,55 @@ class _DeckScreenState extends State<DeckScreen> {
           ),
         ],
       ),
-      body: GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount),
-          itemBuilder: (BuildContext context, index) {
-            return flashcards != null
-                ? FlashcardCard(
-                    categoryId: widget.categoryId,
-                    deckId: widget.deck.id!,
-                    flashcard: flashcards![index],
-                    flip: flip,
-                  )
-                : const Placeholder();
-          },
-          itemCount: flashcards != null ? flashcards!.length : 0),
+      body: Consumer<FlashcardProvider>(builder:
+          (BuildContext context, FlashcardProvider flashcardProvider, _) {
+        flashcardProvider.getAllFlashcards(widget.categoryId, widget.deck.id!);
+        return GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount),
+            itemBuilder: (BuildContext context, index) {
+              return flashcardProvider.flashcards.isNotEmpty
+                  ? FlashcardCard(
+                      categoryId: widget.categoryId,
+                      deckId: widget.deck.id!,
+                      flashcard: flashcardProvider.flashcards[index],
+                      flip: flip,
+                    )
+                  : const Placeholder();
+            },
+            itemCount: flashcardProvider.flashcards.isNotEmpty
+                ? flashcardProvider.flashcards.length
+                : 0);
+      }),
     );
   }
 
   List<FlashcardModel> formStudyFlashcards(int num) {
     List<FlashcardModel> flashcardList = [];
+    List<FlashcardModel> flashcards =
+        Provider.of<FlashcardProvider>(context, listen: false).flashcards;
     while (flashcardList.length < num) {
       int rD = Random().nextInt(15);
-      int rI = Random().nextInt(flashcards!.length);
+      int rI = Random().nextInt(flashcards.length);
       bool add = false;
-      if (rD <= 4 && flashcards![rI].learned == 0 ||
-          flashcards![rI].learned == null) {
+      if (rD <= 4 && flashcards[rI].learned == 0 ||
+          flashcards[rI].learned == null) {
         add = true;
       }
-      if (rD >= 5 && rD <= 8 && flashcards![rI].learned == 25) {
+      if (rD >= 5 && rD <= 8 && flashcards[rI].learned == 25) {
         add = true;
       }
-      if (rD >= 9 && rD <= 11 && flashcards![rI].learned == 50) {
+      if (rD >= 9 && rD <= 11 && flashcards[rI].learned == 50) {
         add = true;
       }
-      if (rD >= 12 && rD <= 13 && flashcards![rI].learned == 75) {
+      if (rD >= 12 && rD <= 13 && flashcards[rI].learned == 75) {
         add = true;
       }
-      if (rD == 14 && flashcards![rI].learned == 100) {
+      if (rD == 14 && flashcards[rI].learned == 100) {
         add = true;
       }
       if (add) {
-        flashcardList.add(flashcards![rI]);
+        flashcardList.add(flashcards[rI]);
       }
     }
     return flashcardList;

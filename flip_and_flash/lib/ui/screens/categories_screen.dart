@@ -1,10 +1,12 @@
 import 'package:flip_and_flash/core/models/category_model.dart';
 import 'package:flip_and_flash/core/models/deck_model.dart';
 import 'package:flip_and_flash/core/models/flashcard_model.dart';
+import 'package:flip_and_flash/core/providers/category_provider.dart';
 import 'package:flip_and_flash/core/services/database.dart';
 import 'package:flip_and_flash/ui/widgets/dialogs/add_category_dialog.dart';
 import 'package:flip_and_flash/ui/screens/category_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 const List<String> languagesList = <String>['English', 'Korean'];
 
@@ -19,7 +21,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   final int crossAxisCount = 2;
   late List<FlashcardModel> cards;
   late List<DeckModel> decks;
-  List<CategoryModel>? categories;
 
   String newCategoryName = "";
   String? newCategoryFrontsideLanguage;
@@ -27,15 +28,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   final DatabaseService _db = DatabaseService();
 
-  void initialFetch() async {
-    categories = await _db.getAllCategories();
-    setState(() {});
-  }
-
   @override
   void initState() {
     super.initState();
-    initialFetch();
     newCategoryFrontsideLanguage ??=
         newCategoryFrontsideLanguage = languagesList.first;
     newCategoryBacksideLanguage ??= languagesList.first;
@@ -49,17 +44,23 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         child: const Icon(Icons.add),
       ),
       appBar: AppBar(title: const Text('Categories')),
-      body: GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount),
-          itemBuilder: (BuildContext context, index) {
-            return categories != null
-                ? CategoryCard(
-                    category: categories![index],
-                  )
-                : Container();
-          },
-          itemCount: categories != null ? categories!.length : 0),
+      body: Consumer<CategoryProvider>(builder:
+          (BuildContext context, CategoryProvider categoryProvider, _) {
+        categoryProvider.getAllCategories();
+        return GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount),
+            itemBuilder: (BuildContext context, index) {
+              return categoryProvider.categories.isNotEmpty
+                  ? CategoryCard(
+                      category: categoryProvider.categories[index],
+                    )
+                  : Container();
+            },
+            itemCount: categoryProvider.categories.isNotEmpty
+                ? categoryProvider.categories.length
+                : 0);
+      }),
     );
   }
 
@@ -75,20 +76,17 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 setState(() {
                   newCategoryName = value!;
                 });
-                print(newCategoryName);
               },
               frontsideLanguageOnChanged: (String? value) {
                 newCategoryFrontsideLanguage = value!;
                 setState(() {
                   newCategoryFrontsideLanguage;
-                  print(newCategoryFrontsideLanguage);
                 });
               },
               backsideLanguageOnChanged: (String? value) {
                 newCategoryBacksideLanguage = value!;
                 setState(() {
                   newCategoryBacksideLanguage;
-                  print(newCategoryBacksideLanguage);
                 });
               },
               submitDialog: () {

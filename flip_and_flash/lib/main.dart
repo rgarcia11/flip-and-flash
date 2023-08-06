@@ -1,9 +1,13 @@
 // import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:firebase_core/firebase_core.dart';
 // import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flip_and_flash/core/providers/category_provider.dart';
+import 'package:flip_and_flash/core/providers/deck_provider.dart';
+import 'package:flip_and_flash/core/providers/flashcard_provider.dart';
 import 'package:flip_and_flash/ui/screens/categories_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   // Initializing firebase application options
@@ -23,9 +27,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Flip and Flash',
-      home: CategoriesScreen(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CategoryProvider()),
+        ChangeNotifierProvider(create: (_) => DeckProvider()),
+        ChangeNotifierProvider(create: (_) => FlashcardProvider()),
+      ],
+      child: const MaterialApp(
+        title: 'Flip and Flash',
+        home: CategoriesScreen(),
+      ),
     );
   }
 }
