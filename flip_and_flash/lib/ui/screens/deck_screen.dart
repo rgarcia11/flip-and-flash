@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flip_and_flash/core/models/deck_model.dart';
 import 'package:flip_and_flash/core/models/flashcard_model.dart';
 import 'package:flip_and_flash/core/providers/flashcard_provider.dart';
@@ -24,144 +22,160 @@ class _DeckScreenState extends State<DeckScreen> {
   bool flip = false;
 
   @override
+  void initState() {
+    super.initState();
+    context
+        .read<FlashcardProvider>()
+        .createFlashcardsStream(widget.categoryId, widget.deck.id!);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    context.read<FlashcardProvider>().dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // TODO: Swap for flow: https://api.flutter.dev/flutter/widgets/Flow-class.html
-      floatingActionButton: ExpandableFab(
-        distance: 200,
-        children: [
-          FloatingActionButton.extended(
-            heroTag: "innerFab1",
-            label: const Text("Study 1 card"),
-            onPressed: () {
-              List<FlashcardModel> flashcardList = formStudyFlashcards(1);
-              Navigator.of(context).push(
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      FlashcardsScreen(
-                    categoryId: widget.categoryId,
-                    deckId: widget.deck.id!,
-                    flashcards: flashcardList,
-                    flip: flip,
+    return Consumer<FlashcardProvider>(builder:
+        (BuildContext context, FlashcardProvider flashcardProvider, _) {
+      return Scaffold(
+        // TODO: Swap for flow: https://api.flutter.dev/flutter/widgets/Flow-class.html
+        floatingActionButton: ExpandableFab(
+          distance: 200,
+          children: [
+            FloatingActionButton.extended(
+              heroTag: "innerFab1",
+              label: const Text("Study 1 card"),
+              onPressed: () {
+                List<int> flashcardsIndices =
+                    flashcardProvider.formStudyFlashcards(1);
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        FlashcardsScreen(
+                      categoryId: widget.categoryId,
+                      deckId: widget.deck.id!,
+                      flashcardsIndices: flashcardsIndices,
+                      flip: flip,
+                    ),
                   ),
-                ),
-              );
-            },
-            icon: const Icon(Icons.school),
-          ),
-          FloatingActionButton.extended(
-            heroTag: "innerFab2",
-            label: const Text("Study 10 cards"),
-            onPressed: () {
-              List<FlashcardModel> flashcardList = formStudyFlashcards(10);
-              Navigator.of(context).push(
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      FlashcardsScreen(
-                    categoryId: widget.categoryId,
-                    deckId: widget.deck.id!,
-                    flashcards: flashcardList,
-                    flip: flip,
+                );
+              },
+              icon: const Icon(Icons.school),
+            ),
+            FloatingActionButton.extended(
+              heroTag: "innerFab2",
+              label: const Text("Study 10 cards"),
+              onPressed: () {
+                List<int> flashcardsIndices =
+                    flashcardProvider.formStudyFlashcards(10);
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        FlashcardsScreen(
+                      categoryId: widget.categoryId,
+                      deckId: widget.deck.id!,
+                      flashcardsIndices: flashcardsIndices,
+                      flip: flip,
+                    ),
                   ),
-                ),
-              );
-            },
-            icon: const Icon(Icons.school),
-          ),
-          FloatingActionButton.extended(
-            heroTag: "innerFab3",
-            label: const Text("Study 20 cards"),
-            onPressed: () {
-              List<FlashcardModel> flashcardList = formStudyFlashcards(20);
-              Navigator.of(context).push(
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      FlashcardsScreen(
-                    categoryId: widget.categoryId,
-                    deckId: widget.deck.id!,
-                    flashcards: flashcardList,
-                    flip: flip,
+                );
+              },
+              icon: const Icon(Icons.school),
+            ),
+            FloatingActionButton.extended(
+              heroTag: "innerFab3",
+              label: const Text("Study 20 cards"),
+              onPressed: () {
+                List<int> flashcardsIndices =
+                    flashcardProvider.formStudyFlashcards(20);
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        FlashcardsScreen(
+                      categoryId: widget.categoryId,
+                      deckId: widget.deck.id!,
+                      flashcardsIndices: flashcardsIndices,
+                      flip: flip,
+                    ),
                   ),
-                ),
-              );
-            },
-            icon: const Icon(Icons.school),
-          ),
-          FloatingActionButton(
-            heroTag: "innerFab4",
-            onPressed: () {
-              Navigator.of(context).push(
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      CreateEditFlashcardScreen(
-                          categoryId: widget.categoryId,
-                          deckId: widget.deck.id!),
-                ),
-              );
-            },
-            child: const Icon(Icons.add),
-          ),
-        ],
-      ),
-      appBar: AppBar(
-        title: Text('Flashcards in ${widget.deck.name}'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              showModalBottomSheet(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Wrap(
-                      children: [
-                        ListTile(
-                          title: const Text('Edit deck'),
-                          onTap: () {
-                            Navigator.of(context).push(
-                              PageRouteBuilder(
-                                pageBuilder:
-                                    (context, animation, secondaryAnimation) =>
-                                        EditDeckScreen(
-                                            categoryId: widget.categoryId,
-                                            deck: widget.deck),
-                              ),
-                            );
-                          },
-                        ),
-                        ListTile(
-                          title: const Text('Add flashcard'),
-                          onTap: () {
-                            Navigator.of(context).push(
-                              PageRouteBuilder(
-                                pageBuilder:
-                                    (context, animation, secondaryAnimation) =>
-                                        CreateEditFlashcardScreen(
-                                            categoryId: widget.categoryId,
-                                            deckId: widget.deck.id!),
-                              ),
-                            );
-                          },
-                        ),
-                        ListTile(
-                          title: const Text("Flip side"),
-                          onTap: () {
-                            setState(() {
-                              flip = !flip;
-                            });
-                          },
-                        ),
-                        const ListTile(),
-                      ],
-                    );
-                  });
-            },
-            icon: const Icon(Icons.segment),
-          ),
-        ],
-      ),
-      body: Consumer<FlashcardProvider>(builder:
-          (BuildContext context, FlashcardProvider flashcardProvider, _) {
-        flashcardProvider.getAllFlashcards(widget.categoryId, widget.deck.id!);
-        return GridView.builder(
+                );
+              },
+              icon: const Icon(Icons.school),
+            ),
+            FloatingActionButton(
+              heroTag: "innerFab4",
+              onPressed: () {
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        CreateEditFlashcardScreen(
+                            categoryId: widget.categoryId,
+                            deckId: widget.deck.id!),
+                  ),
+                );
+              },
+              child: const Icon(Icons.add),
+            ),
+          ],
+        ),
+        appBar: AppBar(
+          title: Text('Flashcards in ${widget.deck.name}'),
+          actions: [
+            IconButton(
+              onPressed: () {
+                showModalBottomSheet(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Wrap(
+                        children: [
+                          ListTile(
+                            title: const Text('Edit deck'),
+                            onTap: () {
+                              Navigator.of(context).push(
+                                PageRouteBuilder(
+                                  pageBuilder: (context, animation,
+                                          secondaryAnimation) =>
+                                      EditDeckScreen(
+                                          categoryId: widget.categoryId,
+                                          deck: widget.deck),
+                                ),
+                              );
+                            },
+                          ),
+                          ListTile(
+                            title: const Text('Add flashcard'),
+                            onTap: () {
+                              Navigator.of(context).push(
+                                PageRouteBuilder(
+                                  pageBuilder: (context, animation,
+                                          secondaryAnimation) =>
+                                      CreateEditFlashcardScreen(
+                                          categoryId: widget.categoryId,
+                                          deckId: widget.deck.id!),
+                                ),
+                              );
+                            },
+                          ),
+                          ListTile(
+                            title: const Text("Flip side"),
+                            onTap: () {
+                              setState(() {
+                                flip = !flip;
+                              });
+                            },
+                          ),
+                          const ListTile(),
+                        ],
+                      );
+                    });
+              },
+              icon: const Icon(Icons.segment),
+            ),
+          ],
+        ),
+        body: GridView.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: crossAxisCount),
             itemBuilder: (BuildContext context, index) {
@@ -171,45 +185,15 @@ class _DeckScreenState extends State<DeckScreen> {
                       deckId: widget.deck.id!,
                       flashcard: flashcardProvider.flashcards[index],
                       flip: flip,
+                      index: index,
                     )
                   : const Placeholder();
             },
             itemCount: flashcardProvider.flashcards.isNotEmpty
                 ? flashcardProvider.flashcards.length
-                : 0);
-      }),
-    );
-  }
-
-  List<FlashcardModel> formStudyFlashcards(int num) {
-    List<FlashcardModel> flashcardList = [];
-    List<FlashcardModel> flashcards =
-        Provider.of<FlashcardProvider>(context, listen: false).flashcards;
-    while (flashcardList.length < num) {
-      int rD = Random().nextInt(15);
-      int rI = Random().nextInt(flashcards.length);
-      bool add = false;
-      if (rD <= 4 && flashcards[rI].learned == 0 ||
-          flashcards[rI].learned == null) {
-        add = true;
-      }
-      if (rD >= 5 && rD <= 8 && flashcards[rI].learned == 25) {
-        add = true;
-      }
-      if (rD >= 9 && rD <= 11 && flashcards[rI].learned == 50) {
-        add = true;
-      }
-      if (rD >= 12 && rD <= 13 && flashcards[rI].learned == 75) {
-        add = true;
-      }
-      if (rD == 14 && flashcards[rI].learned == 100) {
-        add = true;
-      }
-      if (add) {
-        flashcardList.add(flashcards[rI]);
-      }
-    }
-    return flashcardList;
+                : 0),
+      );
+    });
   }
 }
 
@@ -218,11 +202,13 @@ class FlashcardCard extends StatelessWidget {
   final String deckId;
   final FlashcardModel flashcard;
   final bool flip;
+  final int index;
   const FlashcardCard(
       {required this.categoryId,
       required this.deckId,
       required this.flashcard,
       required this.flip,
+      required this.index,
       super.key});
 
   @override
@@ -237,7 +223,7 @@ class FlashcardCard extends StatelessWidget {
                     FlashcardsScreen(
                   categoryId: categoryId,
                   deckId: deckId,
-                  flashcards: [flashcard],
+                  flashcardsIndices: [index],
                   studyMode: false,
                   flip: flip,
                 ),

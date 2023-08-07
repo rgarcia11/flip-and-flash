@@ -6,12 +6,8 @@ import 'package:flip_and_flash/core/models/flashcard_model.dart';
 class DatabaseService {
   final db = FirebaseFirestore.instance;
 
-  Future<List<CategoryModel>> getAllCategories() async {
-    final snapshot = await db.collection("categories").get();
-    final categoryData =
-        snapshot.docs.map((e) => CategoryModel.fromSnapshot(e)).toList();
-    return categoryData;
-  }
+  Stream<QuerySnapshot<Map<String, dynamic>>> getCategoriesStream() =>
+      db.collection("categories").snapshots();
 
   void createCategory(
     CategoryModel newCategory,
@@ -34,18 +30,13 @@ class DatabaseService {
     db.collection("categories").doc(deletedCategoryId).delete();
   }
 
-  Future<List<DeckModel>> getAllDecks(
-    String categoryId,
-  ) async {
-    final snapshot = await db
-        .collection("categories")
-        .doc(categoryId)
-        .collection("decks")
-        .get();
-    final deckData =
-        snapshot.docs.map((e) => DeckModel.fromSnapshot(e)).toList();
-    return deckData;
-  }
+  Stream<QuerySnapshot<Map<String, dynamic>>> getDecksStream(
+          String categoryId) =>
+      db
+          .collection("categories")
+          .doc(categoryId)
+          .collection("decks")
+          .snapshots();
 
   void createDeck(
     String categoryId,
@@ -82,23 +73,17 @@ class DatabaseService {
         .delete();
   }
 
-  Future<List<FlashcardModel>> getAllFlashcards(
-    String categoryId,
-    String deckId,
-  ) async {
-    final snapshot = await db
-        .collection("categories")
-        .doc(categoryId)
-        .collection("decks")
-        .doc(deckId)
-        .collection("cards")
-        .get();
-    final deckData =
-        snapshot.docs.map((e) => FlashcardModel.fromSnapshot(e)).toList();
-    return deckData;
-  }
+  Stream<QuerySnapshot<Map<String, dynamic>>> getFlashcardsStream(
+          String categoryId, String deckId) =>
+      db
+          .collection("categories")
+          .doc(categoryId)
+          .collection("decks")
+          .doc(deckId)
+          .collection("cards")
+          .snapshots();
 
-  void createFlashcard(
+  Future<void> createFlashcard(
     String categoryId,
     String deckId,
     FlashcardModel newFlashcard,
@@ -112,7 +97,7 @@ class DatabaseService {
         .add(newFlashcard.toJson());
   }
 
-  void editFlashcard(
+  Future<void> editFlashcard(
     String categoryId,
     String deckId,
     String flashcardId,

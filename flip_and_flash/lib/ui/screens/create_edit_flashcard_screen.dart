@@ -27,8 +27,8 @@ class CreateEditFlashcardScreen extends StatefulWidget {
 class _CreateEditFlashcardScreenState extends State<CreateEditFlashcardScreen> {
   final DatabaseService _db = DatabaseService();
 
-  String? frontsideValue;
-  String? backsideValue;
+  late String frontsideValue;
+  late String backsideValue;
 
   final TextEditingController frontsideTextController = TextEditingController();
   final TextEditingController backsideTextController = TextEditingController();
@@ -47,25 +47,33 @@ class _CreateEditFlashcardScreenState extends State<CreateEditFlashcardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-          onPressed: () {
+          onPressed: () async {
             if (widget.edit) {
-              _db.editFlashcard(
+              await _db.editFlashcard(
                 widget.categoryId,
                 widget.deckId,
                 widget.flashcard!.id!,
                 FlashcardModel(
-                    frontside: frontsideValue!, backside: backsideValue!),
+                  frontside: frontsideValue,
+                  backside: backsideValue,
+                  learned: widget.flashcard!.learned,
+                ),
               );
-              Navigator.of(context).pop();
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
             } else {
-              _db.createFlashcard(
+              await _db.createFlashcard(
                   widget.categoryId,
                   widget.deckId,
                   FlashcardModel(
-                    frontside: frontsideValue!,
-                    backside: backsideValue!,
+                    frontside: frontsideValue,
+                    backside: backsideValue,
+                    learned: 0,
                   ));
-              Navigator.of(context).pop();
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
             }
           },
           child: Icon(widget.edit ? Icons.check : Icons.add)),
@@ -85,27 +93,29 @@ class _CreateEditFlashcardScreenState extends State<CreateEditFlashcardScreen> {
               ]
             : [],
       ),
-      body: Column(
-        children: [
-          FlashcardSideCard(
-            text: "Enter frontside word or value",
-            textController: frontsideTextController,
-            onChanged: (value) {
-              setState(() {
-                frontsideValue = value;
-              });
-            },
-          ),
-          FlashcardSideCard(
-            text: "Enter backside word or value",
-            textController: backsideTextController,
-            onChanged: (value) {
-              setState(() {
-                backsideValue = value;
-              });
-            },
-          ),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            FlashcardSideCard(
+              text: "Enter frontside word or value",
+              textController: frontsideTextController,
+              onChanged: (value) {
+                setState(() {
+                  frontsideValue = value;
+                });
+              },
+            ),
+            FlashcardSideCard(
+              text: "Enter backside word or value",
+              textController: backsideTextController,
+              onChanged: (value) {
+                setState(() {
+                  backsideValue = value;
+                });
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

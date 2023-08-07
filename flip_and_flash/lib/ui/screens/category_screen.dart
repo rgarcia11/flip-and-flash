@@ -27,6 +27,13 @@ class _CategoryScreenState extends State<CategoryScreen> {
   @override
   void initState() {
     super.initState();
+    context.read<DeckProvider>().createDecksStream(widget.category.id!);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    context.read<DeckProvider>().dispose();
   }
 
   @override
@@ -73,7 +80,6 @@ class _CategoryScreenState extends State<CategoryScreen> {
       ),
       body: Consumer<DeckProvider>(
           builder: (BuildContext context, DeckProvider deckProvider, _) {
-        deckProvider.getAllDecks(widget.category.id!);
         return GridView.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: crossAxisCount),

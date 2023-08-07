@@ -46,7 +46,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       appBar: AppBar(title: const Text('Categories')),
       body: Consumer<CategoryProvider>(builder:
           (BuildContext context, CategoryProvider categoryProvider, _) {
-        categoryProvider.getAllCategories();
         return GridView.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: crossAxisCount),

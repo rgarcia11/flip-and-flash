@@ -1,20 +1,22 @@
 import 'package:flip_and_flash/core/models/flashcard_model.dart';
+import 'package:flip_and_flash/core/providers/flashcard_provider.dart';
 import 'package:flip_and_flash/core/services/database.dart';
 import 'package:flip_and_flash/ui/screens/create_edit_flashcard_screen.dart';
 import 'package:flip_and_flash/ui/screens/deck_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class FlashcardsScreen extends StatefulWidget {
   final String categoryId;
   final String deckId;
-  final List<FlashcardModel> flashcards;
+  final List<int> flashcardsIndices;
   final bool studyMode;
   final bool flip;
 
   const FlashcardsScreen(
       {required this.categoryId,
       required this.deckId,
-      required this.flashcards,
+      required this.flashcardsIndices,
       this.studyMode = true,
       this.flip = false,
       super.key});
@@ -27,147 +29,207 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
   final int crossAxisCount = 2;
   late bool flip;
   int _currentCardIndex = 0;
-  double _currentSliderValue = 0;
+  double? _currentSliderValue;
   final DatabaseService _db = DatabaseService();
 
   @override
   void initState() {
     super.initState();
     flip = widget.flip;
+    // _currentSliderValue = widget.flashcards.first.learned!.toDouble();
+    _currentSliderValue = 0;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        floatingActionButton: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: widget.studyMode
-              ? [
-                  const SizedBox(width: 50),
-                  _currentCardIndex == 0
-                      ? Container()
-                      : FloatingActionButton(
-                          heroTag: "fab1hero",
-                          onPressed: () {
-                            setState(() {
-                              _currentCardIndex -= 1;
-                            });
-                          },
-                          child: const Icon(Icons.arrow_back),
-                        ),
-                  FloatingActionButton(
-                    heroTag: "fab2hero",
-                    onPressed: () {
-                      if (_currentCardIndex == widget.flashcards.length - 1) {
-                        Navigator.pop(context);
-                      } else {
-                        setState(() {
-                          _currentCardIndex += 1;
-                        });
-                      }
-                      _db.editFlashcard(
-                        widget.categoryId,
-                        widget.deckId,
-                        widget.flashcards[_currentCardIndex].id!,
-                        FlashcardModel(
-                          backside:
-                              widget.flashcards[_currentCardIndex].backside,
-                          frontside:
-                              widget.flashcards[_currentCardIndex].frontside,
-                          learned: _currentSliderValue.toInt(),
-                        ),
-                      );
-                    },
-                    child: Icon(
-                      _currentCardIndex == widget.flashcards.length - 1
-                          ? Icons.exit_to_app
-                          : Icons.arrow_forward,
+    return Consumer<FlashcardProvider>(builder:
+        (BuildContext context, FlashcardProvider flashcardProvider, _) {
+      return Scaffold(
+          floatingActionButton: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: widget.studyMode
+                ? [
+                    const SizedBox(width: 50),
+                    _currentCardIndex == 0
+                        ? Container()
+                        : FloatingActionButton(
+                            heroTag: "fab1hero",
+                            onPressed: () {
+                              setState(() {
+                                _currentCardIndex -= 1;
+                              });
+                            },
+                            child: const Icon(Icons.arrow_back),
+                          ),
+                    FloatingActionButton(
+                      heroTag: "fab2hero",
+                      onPressed: () {
+                        if (_currentCardIndex ==
+                            widget.flashcardsIndices.length - 1) {
+                          Navigator.pop(context);
+                        } else {
+                          setState(() {
+                            _currentCardIndex += 1;
+                          });
+                        }
+                        _db.editFlashcard(
+                          widget.categoryId,
+                          widget.deckId,
+                          flashcardProvider
+                              .flashcards[
+                                  widget.flashcardsIndices[_currentCardIndex]]
+                              .id!,
+                          FlashcardModel(
+                            backside: flashcardProvider
+                                .flashcards[
+                                    widget.flashcardsIndices[_currentCardIndex]]
+                                .backside,
+                            frontside: flashcardProvider
+                                .flashcards[
+                                    widget.flashcardsIndices[_currentCardIndex]]
+                                .frontside,
+                            learned: _currentSliderValue!.toInt(),
+                          ),
+                        );
+                      },
+                      child: Icon(
+                        _currentCardIndex == widget.flashcardsIndices.length - 1
+                            ? Icons.exit_to_app
+                            : Icons.arrow_forward,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 50)
-                ]
-              : [],
-        ),
-        appBar: AppBar(
-          title: const Text('Flashcard'),
-          leading: BackButton(
-            onPressed: () {
-              _db.editFlashcard(
-                  widget.categoryId,
-                  widget.deckId,
-                  widget.flashcards[_currentCardIndex].id!,
-                  widget.flashcards[_currentCardIndex]);
-              Navigator.pop(context);
-            },
+                    const SizedBox(width: 50)
+                  ]
+                : [],
           ),
-          actions: [
-            IconButton(
+          appBar: AppBar(
+            title: const Text('Flashcard'),
+            leading: BackButton(
               onPressed: () {
-                Navigator.of(context).push(
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        CreateEditFlashcardScreen(
-                      categoryId: widget.categoryId,
-                      deckId: widget.deckId,
-                      edit: true,
-                      flashcard: widget.flashcards[_currentCardIndex],
-                    ),
-                  ),
-                );
+                _db.editFlashcard(
+                    widget.categoryId,
+                    widget.deckId,
+                    flashcardProvider
+                        .flashcards[widget.flashcardsIndices[_currentCardIndex]]
+                        .id!,
+                    flashcardProvider.flashcards[
+                        widget.flashcardsIndices[_currentCardIndex]]);
+                Navigator.pop(context);
               },
-              icon: const Icon(Icons.edit),
             ),
-          ],
-        ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Card(
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    flip = !flip;
-                  });
-                },
-                child: Container(
-                  width: 300,
-                  height: 300,
-                  padding: const EdgeInsets.all(20.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: getLearnedColor(
-                          widget.flashcards[_currentCardIndex].learned),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          CreateEditFlashcardScreen(
+                        categoryId: widget.categoryId,
+                        deckId: widget.deckId,
+                        edit: true,
+                        flashcard: flashcardProvider.flashcards[
+                            widget.flashcardsIndices[_currentCardIndex]],
+                      ),
                     ),
-                  ),
-                  child: Center(
-                    child: Text(flip
-                        ? widget.flashcards[_currentCardIndex].backside
-                        : widget.flashcards[_currentCardIndex].frontside),
+                  );
+                },
+                icon: const Icon(Icons.edit),
+              ),
+            ],
+          ),
+          body: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Card(
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        flip = !flip;
+                      });
+                    },
+                    child: Container(
+                      width: 300,
+                      height: 300,
+                      padding: const EdgeInsets.all(20.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: getLearnedColor(flashcardProvider
+                              .flashcards[
+                                  widget.flashcardsIndices[_currentCardIndex]]
+                              .learned),
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(flip
+                            ? flashcardProvider
+                                .flashcards[
+                                    widget.flashcardsIndices[_currentCardIndex]]
+                                .backside
+                            : flashcardProvider
+                                .flashcards[
+                                    widget.flashcardsIndices[_currentCardIndex]]
+                                .frontside),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(height: 20),
+                const Text("How well have you learned this card?"),
+                const SizedBox(height: 50),
+                Slider(
+                  value: flashcardProvider
+                              .flashcards[
+                                  widget.flashcardsIndices[_currentCardIndex]]
+                              .learned !=
+                          null
+                      ? flashcardProvider
+                          .flashcards[
+                              widget.flashcardsIndices[_currentCardIndex]]
+                          .learned!
+                          .toDouble()
+                      : 0,
+                  max: 100,
+                  divisions: 4,
+                  label: flashcardProvider
+                              .flashcards[
+                                  widget.flashcardsIndices[_currentCardIndex]]
+                              .learned !=
+                          null
+                      ? "${flashcardProvider.flashcards[widget.flashcardsIndices[_currentCardIndex]].learned!.toString()}%"
+                      : "0%",
+                  onChanged: (double value) {
+                    setState(() {
+                      flashcardProvider
+                          .flashcards[
+                              widget.flashcardsIndices[_currentCardIndex]]
+                          .learned = value.toInt();
+                      FlashcardModel editedFlashcard = FlashcardModel(
+                          frontside: flashcardProvider
+                              .flashcards[
+                                  widget.flashcardsIndices[_currentCardIndex]]
+                              .frontside,
+                          backside: flashcardProvider
+                              .flashcards[
+                                  widget.flashcardsIndices[_currentCardIndex]]
+                              .backside,
+                          learned: value.toInt());
+                      _db.editFlashcard(
+                          widget.categoryId,
+                          widget.deckId,
+                          flashcardProvider
+                              .flashcards[
+                                  widget.flashcardsIndices[_currentCardIndex]]
+                              .id!,
+                          editedFlashcard);
+                      _currentSliderValue = value;
+                    });
+                  },
+                ),
+              ],
             ),
-            const SizedBox(height: 150),
-            const Text("How well have you learned this card?"),
-            const SizedBox(height: 50),
-            Slider(
-              value: widget.flashcards[_currentCardIndex].learned != null
-                  ? widget.flashcards[_currentCardIndex].learned!.toDouble()
-                  : 0,
-              max: 100,
-              divisions: 4,
-              label: widget.flashcards[_currentCardIndex].learned != null
-                  ? "${widget.flashcards[_currentCardIndex].learned!.toString()}%"
-                  : "0%",
-              onChanged: (double value) {
-                setState(() {
-                  widget.flashcards[_currentCardIndex].learned = value.toInt();
-                  _currentSliderValue = value;
-                });
-              },
-            ),
-          ],
-        ));
+          ));
+    });
   }
 }

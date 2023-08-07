@@ -43,10 +43,8 @@ class AddCategoryDialog extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Flexible(
-                    flex: 2, child: Text("Enter frontside language:")),
-                Flexible(
-                  flex: 1,
+                const Expanded(child: Text("Frontside language:")),
+                Expanded(
                   child: DropdownButtonFormField<String>(
                     value: newCategoryFrontsideLanguage,
                     decoration:
@@ -67,10 +65,8 @@ class AddCategoryDialog extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Flexible(
-                    flex: 2, child: Text("Enter backside language:")),
-                Flexible(
-                  flex: 1,
+                const Expanded(child: Text("Backside language:")),
+                Expanded(
                   child: DropdownButtonFormField<String>(
                     value: newCategoryBacksideLanguage,
                     decoration:
