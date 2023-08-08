@@ -5,6 +5,7 @@ import 'package:flip_and_flash/ui/screens/create_edit_flashcard_screen.dart';
 import 'package:flip_and_flash/ui/screens/deck_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 class FlashcardsScreen extends StatefulWidget {
   final String categoryId;
@@ -31,6 +32,8 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
   int _currentCardIndex = 0;
   double? _currentSliderValue;
   final DatabaseService _db = DatabaseService();
+
+  FlutterTts flutterTts = FlutterTts();
 
   @override
   void initState() {
@@ -130,8 +133,13 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
             ),
             actions: [
               IconButton(
-                onPressed: () {
-                  // TODO: Call text to speech API
+                onPressed: () async {
+                  // TODO: languages come from elsewhere
+                  flutterTts.setLanguage(flip ? "ko-KR" : "en-US");
+                  // flutterTts.setLanguage("en-US");
+                  await flutterTts.speak(flashcardProvider
+                      .flashcards[widget.flashcardsIndices[_currentCardIndex]]
+                      .backside);
                 },
                 icon: const Icon(Icons.play_arrow),
               ),
