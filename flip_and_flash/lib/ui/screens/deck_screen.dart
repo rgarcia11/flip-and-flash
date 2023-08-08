@@ -121,7 +121,8 @@ class _DeckScreenState extends State<DeckScreen> {
           ],
         ),
         appBar: AppBar(
-          title: Text('Flashcards in ${widget.deck.name}'),
+          title: Text(
+              'Flashcards in ${widget.deck.name}'), // TODO: This should consume from provider
           actions: [
             IconButton(
               onPressed: () {

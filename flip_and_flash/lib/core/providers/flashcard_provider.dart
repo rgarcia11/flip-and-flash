@@ -28,6 +28,7 @@ class FlashcardProvider extends ChangeNotifier {
   }
 
   List<int> formStudyFlashcards(int num) {
+    // TODO: make it less likely that repeated cards can appear
     List<int> flashcardsIndices = [];
     while (flashcardsIndices.length < num) {
       int rD = Random().nextInt(15);

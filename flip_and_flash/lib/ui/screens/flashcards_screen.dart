@@ -58,6 +58,11 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                             onPressed: () {
                               setState(() {
                                 _currentCardIndex -= 1;
+                                _currentSliderValue = flashcardProvider
+                                    .flashcards[widget
+                                        .flashcardsIndices[_currentCardIndex]]
+                                    .learned!
+                                    .toDouble();
                               });
                             },
                             child: const Icon(Icons.arrow_back),
@@ -71,6 +76,11 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                         } else {
                           setState(() {
                             _currentCardIndex += 1;
+                            _currentSliderValue = flashcardProvider
+                                .flashcards[
+                                    widget.flashcardsIndices[_currentCardIndex]]
+                                .learned!
+                                .toDouble();
                           });
                         }
                         _db.editFlashcard(
@@ -180,16 +190,9 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                 const SizedBox(height: 50),
                 Slider(
                   value: flashcardProvider
-                              .flashcards[
-                                  widget.flashcardsIndices[_currentCardIndex]]
-                              .learned !=
-                          null
-                      ? flashcardProvider
-                          .flashcards[
-                              widget.flashcardsIndices[_currentCardIndex]]
-                          .learned!
-                          .toDouble()
-                      : 0,
+                      .flashcards[widget.flashcardsIndices[_currentCardIndex]]
+                      .learned!
+                      .toDouble(),
                   max: 100,
                   divisions: 4,
                   label: flashcardProvider
@@ -199,30 +202,28 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
                           null
                       ? "${flashcardProvider.flashcards[widget.flashcardsIndices[_currentCardIndex]].learned!.toString()}%"
                       : "0%",
+                  onChangeEnd: (value) {
+                    FlashcardModel editedFlashcard = FlashcardModel(
+                        frontside: flashcardProvider
+                            .flashcards[
+                                widget.flashcardsIndices[_currentCardIndex]]
+                            .frontside,
+                        backside: flashcardProvider
+                            .flashcards[
+                                widget.flashcardsIndices[_currentCardIndex]]
+                            .backside,
+                        learned: value.toInt());
+                    _db.editFlashcard(
+                        widget.categoryId,
+                        widget.deckId,
+                        flashcardProvider
+                            .flashcards[
+                                widget.flashcardsIndices[_currentCardIndex]]
+                            .id!,
+                        editedFlashcard);
+                  },
                   onChanged: (double value) {
                     setState(() {
-                      flashcardProvider
-                          .flashcards[
-                              widget.flashcardsIndices[_currentCardIndex]]
-                          .learned = value.toInt();
-                      FlashcardModel editedFlashcard = FlashcardModel(
-                          frontside: flashcardProvider
-                              .flashcards[
-                                  widget.flashcardsIndices[_currentCardIndex]]
-                              .frontside,
-                          backside: flashcardProvider
-                              .flashcards[
-                                  widget.flashcardsIndices[_currentCardIndex]]
-                              .backside,
-                          learned: value.toInt());
-                      _db.editFlashcard(
-                          widget.categoryId,
-                          widget.deckId,
-                          flashcardProvider
-                              .flashcards[
-                                  widget.flashcardsIndices[_currentCardIndex]]
-                              .id!,
-                          editedFlashcard);
                       _currentSliderValue = value;
                     });
                   },

@@ -51,6 +51,8 @@ class EditDeckScreenState extends State<EditDeckScreen> {
               _db.deleteDeck(widget.categoryId, widget.deck.id!);
               Navigator.of(context).pop();
               Navigator.of(context).pop();
+              Navigator.of(context).pop();
+              // TODO: We need a better routing system
             },
             icon: const Icon(Icons.delete),
           ),
