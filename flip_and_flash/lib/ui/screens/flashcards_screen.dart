@@ -41,6 +41,7 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
     flip = widget.flip;
     // _currentSliderValue = widget.flashcards.first.learned!.toDouble();
     _currentSliderValue = 0;
+    flutterTts.setVolume(1.0);
   }
 
   @override
@@ -135,7 +136,8 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
               IconButton(
                 onPressed: () async {
                   // TODO: languages come from elsewhere
-                  flutterTts.setLanguage(flip ? "ko-KR" : "en-US");
+                  // flutterTts.setLanguage(flip ? "ko-KR" : "en-US");
+                  flutterTts.setLanguage("ko-KR");
                   // flutterTts.setLanguage("en-US");
                   await flutterTts.speak(flashcardProvider
                       .flashcards[widget.flashcardsIndices[_currentCardIndex]]
