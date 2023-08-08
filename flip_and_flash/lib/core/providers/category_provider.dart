@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flip_and_flash/core/models/category_model.dart';
 import 'package:flip_and_flash/core/services/database.dart';
 import 'package:flutter/widgets.dart';
@@ -16,13 +15,10 @@ class CategoryProvider extends ChangeNotifier {
     _db.getCategoriesStream().listen((event) {
       categories =
           event.docs.map((e) => CategoryModel.fromSnapshot(e)).toList();
-      categoriesById = event.docs.fold<Map<String, CategoryModel>>(
-          categoriesById, (Map<String, CategoryModel> categoriesMap,
-              DocumentSnapshot<Map<String, dynamic>> snapshot) {
-        CategoryModel category = CategoryModel.fromSnapshot(snapshot);
-        categoriesMap[category.id!] = category;
-        return categoriesMap;
-      });
+      categoriesById = {
+        for (final snapshot in event.docs)
+          snapshot.id: CategoryModel.fromSnapshot(snapshot)
+      };
       notifyListeners();
     });
   }
