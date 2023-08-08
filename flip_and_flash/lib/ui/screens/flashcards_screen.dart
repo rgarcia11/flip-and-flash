@@ -131,6 +131,12 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
             actions: [
               IconButton(
                 onPressed: () {
+                  // TODO: Call text to speech API
+                },
+                icon: const Icon(Icons.play_arrow),
+              ),
+              IconButton(
+                onPressed: () {
                   Navigator.of(context).push(
                     PageRouteBuilder(
                       pageBuilder: (context, animation, secondaryAnimation) =>
