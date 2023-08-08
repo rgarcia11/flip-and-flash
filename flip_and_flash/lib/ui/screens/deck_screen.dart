@@ -1,5 +1,5 @@
-import 'package:flip_and_flash/core/models/deck_model.dart';
 import 'package:flip_and_flash/core/models/flashcard_model.dart';
+import 'package:flip_and_flash/core/providers/deck_provider.dart';
 import 'package:flip_and_flash/core/providers/flashcard_provider.dart';
 import 'package:flip_and_flash/ui/screens/create_edit_flashcard_screen.dart';
 import 'package:flip_and_flash/ui/screens/edit_deck_screen.dart';
@@ -10,8 +10,8 @@ import 'package:provider/provider.dart';
 
 class DeckScreen extends StatefulWidget {
   final String categoryId;
-  final DeckModel deck;
-  const DeckScreen({required this.categoryId, required this.deck, super.key});
+  final String deckId;
+  const DeckScreen({required this.categoryId, required this.deckId, super.key});
 
   @override
   State<DeckScreen> createState() => _DeckScreenState();
@@ -26,7 +26,7 @@ class _DeckScreenState extends State<DeckScreen> {
     super.initState();
     context
         .read<FlashcardProvider>()
-        .createFlashcardsStream(widget.categoryId, widget.deck.id!);
+        .createFlashcardsStream(widget.categoryId, widget.deckId);
   }
 
   @override
@@ -55,7 +55,7 @@ class _DeckScreenState extends State<DeckScreen> {
                     pageBuilder: (context, animation, secondaryAnimation) =>
                         FlashcardsScreen(
                       categoryId: widget.categoryId,
-                      deckId: widget.deck.id!,
+                      deckId: widget.deckId,
                       flashcardsIndices: flashcardsIndices,
                       flip: flip,
                     ),
@@ -75,7 +75,7 @@ class _DeckScreenState extends State<DeckScreen> {
                     pageBuilder: (context, animation, secondaryAnimation) =>
                         FlashcardsScreen(
                       categoryId: widget.categoryId,
-                      deckId: widget.deck.id!,
+                      deckId: widget.deckId,
                       flashcardsIndices: flashcardsIndices,
                       flip: flip,
                     ),
@@ -95,7 +95,7 @@ class _DeckScreenState extends State<DeckScreen> {
                     pageBuilder: (context, animation, secondaryAnimation) =>
                         FlashcardsScreen(
                       categoryId: widget.categoryId,
-                      deckId: widget.deck.id!,
+                      deckId: widget.deckId,
                       flashcardsIndices: flashcardsIndices,
                       flip: flip,
                     ),
@@ -112,7 +112,7 @@ class _DeckScreenState extends State<DeckScreen> {
                     pageBuilder: (context, animation, secondaryAnimation) =>
                         CreateEditFlashcardScreen(
                             categoryId: widget.categoryId,
-                            deckId: widget.deck.id!),
+                            deckId: widget.deckId),
                   ),
                 );
               },
@@ -121,8 +121,11 @@ class _DeckScreenState extends State<DeckScreen> {
           ],
         ),
         appBar: AppBar(
-          title: Text(
-              'Flashcards in ${widget.deck.name}'), // TODO: This should consume from provider
+          title: Consumer<DeckProvider>(
+              builder: (BuildContext context, DeckProvider deckProvider, _) {
+            return Text(
+                'Flashcards in ${deckProvider.decksById[widget.deckId]!.name}');
+          }), // TODO: This should consume from provider
           actions: [
             IconButton(
               onPressed: () {
@@ -140,7 +143,7 @@ class _DeckScreenState extends State<DeckScreen> {
                                           secondaryAnimation) =>
                                       EditDeckScreen(
                                           categoryId: widget.categoryId,
-                                          deck: widget.deck),
+                                          deckId: widget.deckId),
                                 ),
                               );
                             },
@@ -154,7 +157,7 @@ class _DeckScreenState extends State<DeckScreen> {
                                           secondaryAnimation) =>
                                       CreateEditFlashcardScreen(
                                           categoryId: widget.categoryId,
-                                          deckId: widget.deck.id!),
+                                          deckId: widget.deckId),
                                 ),
                               );
                             },
@@ -183,7 +186,7 @@ class _DeckScreenState extends State<DeckScreen> {
               return flashcardProvider.flashcards.isNotEmpty
                   ? FlashcardCard(
                       categoryId: widget.categoryId,
-                      deckId: widget.deck.id!,
+                      deckId: widget.deckId,
                       flashcard: flashcardProvider.flashcards[index],
                       flip: flip,
                       index: index,

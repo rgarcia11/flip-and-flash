@@ -1,16 +1,18 @@
 import 'package:flip_and_flash/core/models/deck_model.dart';
+import 'package:flip_and_flash/core/providers/deck_provider.dart';
 import 'package:flip_and_flash/core/services/database.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 const List<String> languagesList = <String>['English', 'Korean'];
 
 // ignore: must_be_immutable
 class EditDeckScreen extends StatefulWidget {
   final String categoryId;
-  final DeckModel deck;
+  final String deckId;
 
   const EditDeckScreen(
-      {required this.categoryId, required this.deck, super.key});
+      {required this.categoryId, required this.deckId, super.key});
 
   @override
   State<EditDeckScreen> createState() => EditDeckScreenState();
@@ -24,8 +26,8 @@ class EditDeckScreenState extends State<EditDeckScreen> {
   @override
   void initState() {
     super.initState();
-
-    nameTextController.text = widget.deck.name;
+    nameTextController.text =
+        context.read<DeckProvider>().decksById[widget.deckId]!.name;
   }
 
   @override
@@ -36,7 +38,7 @@ class EditDeckScreenState extends State<EditDeckScreen> {
             _db.editDeck(
                 widget.categoryId,
                 DeckModel(
-                  id: widget.deck.id,
+                  id: widget.deckId,
                   name: nameTextController.text,
                 ));
             Navigator.of(context).pop();
@@ -48,7 +50,7 @@ class EditDeckScreenState extends State<EditDeckScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              _db.deleteDeck(widget.categoryId, widget.deck.id!);
+              _db.deleteDeck(widget.categoryId, widget.deckId);
               Navigator.of(context).pop();
               Navigator.of(context).pop();
               Navigator.of(context).pop();

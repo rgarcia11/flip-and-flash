@@ -1,5 +1,5 @@
-import 'package:flip_and_flash/core/models/category_model.dart';
 import 'package:flip_and_flash/core/models/deck_model.dart';
+import 'package:flip_and_flash/core/providers/category_provider.dart';
 import 'package:flip_and_flash/core/providers/deck_provider.dart';
 import 'package:flip_and_flash/core/services/database.dart';
 import 'package:flip_and_flash/ui/screens/edit_category_screen.dart';
@@ -9,9 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CategoryScreen extends StatefulWidget {
-  final CategoryModel category;
+  final String categoryId;
 
-  const CategoryScreen({required this.category, super.key});
+  const CategoryScreen({required this.categoryId, super.key});
 
   @override
   State<CategoryScreen> createState() => _CategoryScreenState();
@@ -27,7 +27,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<DeckProvider>().createDecksStream(widget.category.id!);
+    context.read<DeckProvider>().createDecksStream(widget.categoryId);
   }
 
   @override
@@ -38,63 +38,68 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AddDeckDialog(
-                  textFieldOnChanged: (value) {
-                    setState(() {
-                      newDeckName = value!;
-                    });
-                  },
-                  submitDialog: () {
-                    _db.createDeck(
-                        widget.category.id!,
-                        DeckModel(
-                          name: newDeckName,
-                        ));
-                    Navigator.of(context).pop();
-                  },
+    return Consumer<CategoryProvider>(
+        builder: (BuildContext context, CategoryProvider categoryProvider, _) {
+      return Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AddDeckDialog(
+                    textFieldOnChanged: (value) {
+                      setState(() {
+                        newDeckName = value!;
+                      });
+                    },
+                    submitDialog: () {
+                      _db.createDeck(
+                          widget.categoryId,
+                          DeckModel(
+                            name: newDeckName,
+                          ));
+                      Navigator.of(context).pop();
+                    },
+                  );
+                });
+          },
+          child: const Icon(Icons.add),
+        ),
+        appBar: AppBar(
+          title: Text(
+              'Decks in ${categoryProvider.categoriesById[widget.categoryId]!.name}'),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          EditCategoryScreen(categoryId: widget.categoryId)),
                 );
-              });
-        },
-        child: const Icon(Icons.add),
-      ),
-      appBar: AppBar(
-        title: Text('Decks in ${widget.category.name}'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        EditCategoryScreen(category: widget.category)),
-              );
-            },
-            icon: const Icon(Icons.edit),
-          ),
-        ],
-      ),
-      body: Consumer<DeckProvider>(
-          builder: (BuildContext context, DeckProvider deckProvider, _) {
-        return GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount),
-            itemBuilder: (BuildContext context, index) {
-              return deckProvider.decks.isNotEmpty
-                  ? DeckCard(
-                      categoryId: widget.category.id!,
-                      deck: deckProvider.decks[index],
-                    )
-                  : Container();
-            },
-            itemCount:
-                deckProvider.decks.isNotEmpty ? deckProvider.decks.length : 0);
-      }),
-    );
+              },
+              icon: const Icon(Icons.edit),
+            ),
+          ],
+        ),
+        body: Consumer<DeckProvider>(
+            builder: (BuildContext context, DeckProvider deckProvider, _) {
+          return GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: crossAxisCount),
+              itemBuilder: (BuildContext context, index) {
+                return deckProvider.decks.isNotEmpty
+                    ? DeckCard(
+                        categoryId: widget.categoryId,
+                        deck: deckProvider.decks[index],
+                      )
+                    : Container();
+              },
+              itemCount: deckProvider.decks.isNotEmpty
+                  ? deckProvider.decks.length
+                  : 0);
+        }),
+      );
+    });
   }
 }
 
@@ -114,7 +119,7 @@ class DeckCard extends StatelessWidget {
                 pageBuilder: (context, animation, secondaryAnimation) =>
                     DeckScreen(
                   categoryId: categoryId,
-                  deck: deck,
+                  deckId: deck.id!,
                 ),
               ),
             );

@@ -1,14 +1,16 @@
 import 'package:flip_and_flash/core/models/category_model.dart';
+import 'package:flip_and_flash/core/providers/category_provider.dart';
 import 'package:flip_and_flash/core/services/database.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 const List<String> languagesList = <String>['English', 'Korean'];
 
 // ignore: must_be_immutable
 class EditCategoryScreen extends StatefulWidget {
-  final CategoryModel category;
+  final String categoryId;
 
-  const EditCategoryScreen({required this.category, super.key});
+  const EditCategoryScreen({required this.categoryId, super.key});
 
   @override
   State<EditCategoryScreen> createState() => EditCategoryScreenState();
@@ -24,117 +26,128 @@ class EditCategoryScreenState extends State<EditCategoryScreen> {
   @override
   void initState() {
     super.initState();
-
-    nameTextController.text = widget.category.name;
-    editedCategoryFrontsideLanguage = widget.category.frontsideLanguage;
-    editedCategoryBacksideLanguage = widget.category.backsideLanguage;
+    nameTextController.text = context
+        .read<CategoryProvider>()
+        .categoriesById[widget.categoryId]!
+        .name;
+    editedCategoryFrontsideLanguage = context
+        .read<CategoryProvider>()
+        .categoriesById[widget.categoryId]!
+        .frontsideLanguage;
+    editedCategoryBacksideLanguage = context
+        .read<CategoryProvider>()
+        .categoriesById[widget.categoryId]!
+        .backsideLanguage;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            _db.editCategory(CategoryModel(
-              id: widget.category.id,
-              name: nameTextController.text,
-              frontsideLanguage: editedCategoryFrontsideLanguage,
-              backsideLanguage: editedCategoryBacksideLanguage,
-            ));
-            Navigator.of(context).pop();
-          },
-          child: const Icon(Icons.check)),
-      appBar: AppBar(
-        title: const Text("Edit category"),
-        actions: [
-          IconButton(
+    return Consumer<CategoryProvider>(
+        builder: (BuildContext context, CategoryProvider categoryProvider, _) {
+      return Scaffold(
+        floatingActionButton: FloatingActionButton(
             onPressed: () {
-              _db.deleteCategory(widget.category.id!);
-              Navigator.of(context).pop();
+              _db.editCategory(CategoryModel(
+                id: widget.categoryId,
+                name: nameTextController.text,
+                frontsideLanguage: editedCategoryFrontsideLanguage,
+                backsideLanguage: editedCategoryBacksideLanguage,
+              ));
               Navigator.of(context).pop();
             },
-            icon: const Icon(Icons.delete),
-          ),
-        ],
-      ),
-      body: Container(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-                decoration: const InputDecoration(
-                  hintText: "Edit category name",
-                  border: OutlineInputBorder(),
-                ),
-                controller: nameTextController,
-                onChanged: (value) {
-                  // setState(() {
-                  //   nameTextController.text = value;
-                  // });
-                }),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Flexible(
-                    flex: 2, child: Text("Enter frontside language:")),
-                Flexible(
-                  flex: 1,
-                  child: DropdownButtonFormField<String>(
-                    value: editedCategoryFrontsideLanguage,
-                    decoration:
-                        const InputDecoration(border: OutlineInputBorder()),
-                    onChanged: (String? value) {
-                      editedCategoryFrontsideLanguage = value!;
-                      setState(() {
-                        editedCategoryFrontsideLanguage;
-                      });
-                    },
-                    items: languagesList
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Flexible(
-                    flex: 2, child: Text("Enter backside language:")),
-                Flexible(
-                  flex: 1,
-                  child: DropdownButtonFormField<String>(
-                    value: editedCategoryBacksideLanguage,
-                    decoration:
-                        const InputDecoration(border: OutlineInputBorder()),
-                    onChanged: (String? value) {
-                      editedCategoryBacksideLanguage = value!;
-                      setState(() {
-                        editedCategoryBacksideLanguage;
-                      });
-                    },
-                    items: languagesList
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ],
+            child: const Icon(Icons.check)),
+        appBar: AppBar(
+          title: const Text("Edit category"),
+          actions: [
+            IconButton(
+              onPressed: () {
+                _db.deleteCategory(widget.categoryId);
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+              icon: const Icon(Icons.delete),
             ),
           ],
         ),
-      ),
-    );
+        body: Container(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                  decoration: const InputDecoration(
+                    hintText: "Edit category name",
+                    border: OutlineInputBorder(),
+                  ),
+                  controller: nameTextController,
+                  onChanged: (value) {
+                    // setState(() {
+                    //   nameTextController.text = value;
+                    // });
+                  }),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Flexible(
+                      flex: 2, child: Text("Enter frontside language:")),
+                  Flexible(
+                    flex: 1,
+                    child: DropdownButtonFormField<String>(
+                      value: editedCategoryFrontsideLanguage,
+                      decoration:
+                          const InputDecoration(border: OutlineInputBorder()),
+                      onChanged: (String? value) {
+                        editedCategoryFrontsideLanguage = value!;
+                        setState(() {
+                          editedCategoryFrontsideLanguage;
+                        });
+                      },
+                      items: languagesList
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Flexible(
+                      flex: 2, child: Text("Enter backside language:")),
+                  Flexible(
+                    flex: 1,
+                    child: DropdownButtonFormField<String>(
+                      value: editedCategoryBacksideLanguage,
+                      decoration:
+                          const InputDecoration(border: OutlineInputBorder()),
+                      onChanged: (String? value) {
+                        editedCategoryBacksideLanguage = value!;
+                        setState(() {
+                          editedCategoryBacksideLanguage;
+                        });
+                      },
+                      items: languagesList
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    });
   }
 }
 

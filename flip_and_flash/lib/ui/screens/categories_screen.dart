@@ -51,8 +51,32 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 crossAxisCount: crossAxisCount),
             itemBuilder: (BuildContext context, index) {
               return categoryProvider.categories.isNotEmpty
-                  ? CategoryCard(
-                      category: categoryProvider.categories[index],
+                  ? Center(
+                      child: Card(
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        CategoryScreen(
+                                  categoryId:
+                                      categoryProvider.categories[index].id!,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            width: 300,
+                            height: 300,
+                            padding: const EdgeInsets.all(20.0),
+                            child: Center(
+                              child:
+                                  Text(categoryProvider.categories[index].name),
+                            ),
+                          ),
+                        ),
+                      ),
                     )
                   : Container();
             },
@@ -97,38 +121,5 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 Navigator.of(context).pop();
               });
         });
-  }
-}
-
-class CategoryCard extends StatelessWidget {
-  final CategoryModel category;
-  const CategoryCard({required this.category, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Card(
-        child: InkWell(
-          onTap: () {
-            Navigator.of(context).push(
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    CategoryScreen(
-                  category: category,
-                ),
-              ),
-            );
-          },
-          child: Container(
-            width: 300,
-            height: 300,
-            padding: const EdgeInsets.all(20.0),
-            child: Center(
-              child: Text(category.name),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
